@@ -9,13 +9,7 @@ A tarot card reading plugin for Emacs, built as a structured learning exercise i
 Emacs Lisp and Emacs package development. Development is test-driven: each iteration
 begins with a failing test, then implements the minimum to pass it, then refactors.
 
-Starting fresh from the existing repository (prior iterations preserved in git
-history) to fix identified issues in the previous codebase:
-
-- Tests were co-located with production code in `tarot.el`
-- `tarot-reading` never shuffled the deck (bug: always dealt the same order)
-- `tarot-shuffle` was a redundant thin wrapper around `tarot--shuffle`
-- No `defgroup` / `defcustom` for the customization system
+A tarot card reading package for Emacs, built with TDD as the driving methodology.
 
 ---
 
@@ -221,8 +215,8 @@ Concepts: state-dependent rendering, conditional `insert`
 Concepts: `defcustom`, `:type`, `:group`, `M-x customize`
 
 **Iteration 15: Full interactive command**
-`M-x tarot-reading` with `completing-read` for spread selection. Shuffle wired
-in correctly (fixing the prior codebase bug).
+`M-x tarot-reading` with `completing-read` for spread selection. Deck is
+shuffled before drawing.
 Concepts: `interactive`, `completing-read`, tying all layers together
 
 ### Optional
