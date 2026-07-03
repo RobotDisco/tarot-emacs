@@ -146,7 +146,7 @@ Set up `tarot-test.el` as a separate file with a sanity-check test.
 Concepts: `provide`/`require`, ERT basics, `M-x ert`
 
 **Iteration 2: Deck construction**
-`tarot-make-deck` returns a list of cards.
+`tarot-deck` is a `defconst` holding the full 78-card deck.
 *Learn by Doing:* how to represent a card; major vs minor distinction emerges
 from tests.
 Concepts: `defconst`, `mapcar`, `append`, `cl-loop`

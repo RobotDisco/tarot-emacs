@@ -13,6 +13,63 @@
 ;; A tarot card reader for Emacs.
 
 ;;; Code:
+(require 'cl-lib)
+
+(defconst tarot-major-arcana
+  '((:name "The Fool")
+    (:name "The Magician")
+    (:name "The High Priestess")
+    (:name "The Empress")
+    (:name "The Emperor")
+    (:name "The Hierophant")
+    (:name "The Lovers")
+    (:name "The Chariot")
+    (:name "Strength")
+    (:name "The Hermit")
+    (:name "Wheel of Fortune")
+    (:name "Justice")
+    (:name "The Hanged Man")
+    (:name "Death")
+    (:name "Temperance")
+    (:name "The Devil")
+    (:name "The Tower")
+    (:name "The Star")
+    (:name "The Moon")
+    (:name "The Sun")
+    (:name "Judgement")
+    (:name "The World"))
+  "List of major arcana cards in a standard tarot deck.")
+
+(defconst tarot-minor-ranks
+  '("Ace"
+    "Two"
+    "Three"
+    "Four"
+    "Five"
+    "Six"
+    "Seven"
+    "Eight"
+    "Nine"
+    "Ten"
+    "Page"
+    "Knight"
+    "Queen"
+    "King")
+  "List of card ranks in the minor arcana of a standard tarot deck.")
+
+(defconst tarot-minor-suits
+  '("Cups"
+    "Pentacles"
+    "Swords"
+    "Wands")
+  "List of card suits in the minor arcana of a standard tarot deck.")
+
+(defconst tarot-deck
+  (append tarot-major-arcana
+	  (cl-loop for suit in tarot-minor-suits
+		   append (cl-loop for rank in tarot-minor-ranks
+				   collect (list :name (format "%s of %s" rank suit)))))
+  "Non-shuffled tarot deck.")
 
 (provide 'tarot)
 ;;; tarot.el ends here

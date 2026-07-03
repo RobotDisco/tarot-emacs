@@ -21,5 +21,21 @@
 
 ;;; Iteration 2 - Card data ----------------------------------------------------
 
+(ert-deftest tarot-test-deck-has-78-cards ()
+  "Tarot deck needs right number of cards."
+  (should (= (length tarot-deck) 78)))
+
+(ert-deftest tarot-test-deck-has-major-arcana-cards ()
+  "Tarot deck has all major arcana cards."
+  (dolist (card tarot-major-arcana)
+    (should (cl-member card tarot-deck :test #'equal))))
+
+(ert-deftest tarot-test-deck-has-all-minor-rank-suit-combinations ()
+  "Tarot deck has 14 cards for all four suits."
+  (dolist (suit tarot-minor-suits)
+    (dolist (rank tarot-minor-ranks)
+      (let ((card (list :name (format "%s of %s" rank suit))))
+	(should (cl-member card tarot-deck :test #'equal))))))
+
 (provide 'tarot-test)
 ;;; tarot-test.el ends here
