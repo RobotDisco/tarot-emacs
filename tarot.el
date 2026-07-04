@@ -15,6 +15,9 @@
 ;;; Code:
 (require 'cl-lib)
 
+
+;;; Tarot card constants -------------------------------------------------------
+
 (defconst tarot-major-arcana
   '((:name "The Fool")
     (:name "The Magician")
@@ -71,9 +74,34 @@
 				   collect (list :name (format "%s of %s" rank suit)))))
   "Non-shuffled tarot deck.")
 
+
+;;; Tarot card operations ------------------------------------------------------
+
 (defun tarot-card-name (card)
   "Return the friendly name for CARD."
   (plist-get card :name))
+
+(defun tarot-shuffle (deck)
+  "Return shuffled copy of sequence DECK.
+
+Uses Fisher-Yates algorithm for shuffling.
+
+For more details, see https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_modern_algorithm"
+  (let ((deck-vec (vconcat deck)))
+    ;; "processed" random selections collect at end of vector.
+    ;; No point randomly picking from 1 candidate, so we finish at pos 2.
+    (dolist (ceiling (number-sequence (length deck) 2 -1))
+      ;; Pick one entity from the unprocessed part of our sequence
+      (let* ((rand-idx (random ceiling))
+	     (rand-val (aref deck-vec rand-idx))
+	     ;; Temp store the value just under the ceiling for when we swap it.
+	     (ceil-val (aref deck-vec (1- ceiling))))
+	;; Swap the picked value with the value just under the ceiling of
+	;; unprocessed elements. The ceiling lowers to include this new pick
+	;; next round.
+	(setf (aref deck-vec rand-idx) ceil-val
+	      (aref deck-vec (1- ceiling)) rand-val)))
+    (cl-coerce deck-vec 'list)))
 
 (provide 'tarot)
 ;;; tarot.el ends here

@@ -44,5 +44,26 @@
   (should (equal (tarot-card-name '(:name "The Magician")) "The Magician"))
   (should (equal (tarot-card-name '(:name "Ace of Cups")) "Ace of Cups")))
 
+;;; Iteration 4 - Card shuffling -----------------------------------------------
+
+(ert-deftest tarot-test-shuffling-does-not-change-count ()
+  "Shuffling tarot deck does not change number of cards in deck."
+  (should (= (length tarot-deck) (length (tarot-shuffle tarot-deck)))))
+
+(ert-deftest tarot-test-shuffled-deck-has-same-cards-as-unshuffled ()
+  "Shuffling tarot deck does not change the cards, only their positions."
+  (let ((shuffled (tarot-shuffle tarot-deck)))
+    (dolist (card tarot-deck)
+      (should (cl-member card shuffled :test #'equal)))))
+
+(ert-deftest tarot-test-shuffling-does-not-mutate-original-deck ()
+  "Shuffling does not mutate the original deck, but creates a copy."
+  (let ((shuffled (tarot-shuffle tarot-deck)))
+    (should-not (equal tarot-deck shuffled))))
+
+(ert-deftest tarot-test-handles-empty-list ()
+  "Shuffling handles an empty list."
+  (should (equal (tarot-shuffle '()) '())))
+
 (provide 'tarot-test)
 ;;; tarot-test.el ends here

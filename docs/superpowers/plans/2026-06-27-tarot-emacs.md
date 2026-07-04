@@ -33,7 +33,7 @@ count, major arcana coverage, and minor arcana coverage.
 A function that returns a human-readable name string for any card in the deck.
 Major arcana return their name directly. Minor arcana return "Rank of Suit" format.
 
-### Task 4: Shuffling
+### Task 4: Shuffling ✓
 A function that returns a new shuffled copy of the deck without modifying the
 original. Tests verify count is preserved, card set is preserved, and the original
 is not mutated.
