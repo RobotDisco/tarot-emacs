@@ -37,5 +37,12 @@
       (let ((card (list :name (format "%s of %s" rank suit))))
 	(should (cl-member card tarot-deck :test #'equal))))))
 
+;;; Iteration 3 - Card accessors -----------------------------------------------
+
+(ert-deftest tarot-test-card-name ()
+  "Function to get name of tarot card."
+  (should (equal (tarot-card-name '(:name "The Magician")) "The Magician"))
+  (should (equal (tarot-card-name '(:name "Ace of Cups")) "Ace of Cups")))
+
 (provide 'tarot-test)
 ;;; tarot-test.el ends here

@@ -29,7 +29,7 @@ A constant representing the full 78-card deck. Cards have a name. The deck cover
 all 22 major arcana and all 56 minor arcana (4 suits × 14 ranks). Tests verify
 count, major arcana coverage, and minor arcana coverage.
 
-### Task 3: Card naming
+### Task 3: Card naming ✓
 A function that returns a human-readable name string for any card in the deck.
 Major arcana return their name directly. Minor arcana return "Rank of Suit" format.
 

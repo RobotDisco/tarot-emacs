@@ -71,5 +71,9 @@
 				   collect (list :name (format "%s of %s" rank suit)))))
   "Non-shuffled tarot deck.")
 
+(defun tarot-card-name (card)
+  "Return the friendly name for CARD."
+  (plist-get card :name))
+
 (provide 'tarot)
 ;;; tarot.el ends here
