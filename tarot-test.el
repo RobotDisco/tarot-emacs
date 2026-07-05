@@ -65,5 +65,27 @@
   "Shuffling handles an empty list."
   (should (equal (tarot-shuffle '()) '())))
 
+;;; Iteration 5 - Drawing cards ------------------------------------------------
+
+(ert-deftest tarot-test-draw-cards ()
+  "Drawing N cards returns the first N cards from the deck."
+  (should (equal (car (tarot-draw tarot-deck 3))
+		 (take 3 tarot-deck)))
+  (should (equal (car (tarot-draw '() 5))
+		 '())))
+
+(ert-deftest tarot-test-draw-count ()
+  "The number of cards drawn and left is the same as the total deck number."
+  (seq-let (drawn remaining) (tarot-draw tarot-deck 5)
+    (should (= (length drawn) 5))
+    (should (= (length remaining) (- (length tarot-deck) 5)))))
+
+(ert-deftest tarot-test-draw-splits-deck ()
+  "The cards in the drawn and remaining piles make up the entire deck."
+  (seq-let (drawn remaining) (tarot-draw tarot-deck 5)
+    (should (equal (append drawn remaining)
+		   tarot-deck))))
+
+
 (provide 'tarot-test)
 ;;; tarot-test.el ends here

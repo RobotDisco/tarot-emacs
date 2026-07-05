@@ -38,7 +38,7 @@ A function that returns a new shuffled copy of the deck without modifying the
 original. Tests verify count is preserved, card set is preserved, and the original
 is not mutated.
 
-### Task 5: Drawing
+### Task 5: Drawing ✓
 A function that draws N cards from a deck and returns both the drawn cards and the
 remaining deck as a single return value.
 

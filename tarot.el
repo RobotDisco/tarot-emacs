@@ -103,5 +103,14 @@ For more details, see https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
 	      (aref deck-vec (1- ceiling)) rand-val)))
     (cl-coerce deck-vec 'list)))
 
+(defun tarot-draw (deck count)
+  "Return the first COUNT cards from DECK, and remaining cards.
+
+Returns a two-element list:
+1. A list of cards drawn from the deck.
+2. A list of cards remaining in the deck."
+  (list (take count deck)
+	(drop count deck)))
+
 (provide 'tarot)
 ;;; tarot.el ends here
