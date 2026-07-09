@@ -48,10 +48,10 @@ remaining deck as a single return value.
 
 Combining cards into readings, adding orientation, attaching meaning.
 
-### Task 6: Reversals ★ Learn by Doing
+### Task 6: Reversals ★ Learn by Doing ✓
 A function that takes a card and returns a new card with a randomly assigned
-orientation (upright or reversed). The original card is not modified. The
-orientation value must be strictly boolean.
+orientation (upright or reversed). The original card is not modified. Orientation
+is stored as `:orientation :upright` or `:orientation :reversed` on the card plist.
 
 ### Task 7: Spreads and readings ★ Learn by Doing
 Spread definitions (single card, three card, Celtic Cross — each with a name and

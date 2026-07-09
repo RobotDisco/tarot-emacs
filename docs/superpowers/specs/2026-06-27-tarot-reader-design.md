@@ -107,11 +107,12 @@ Selected position additionally shows:
 ## Reversals
 
 Cards are drawn with a randomly assigned orientation (50% upright, 50% reversed).
-`:reversed` is added to the card plist at draw time, not stored in the deck.
+`:orientation` is added to the card plist at draw time with a value of either
+`:upright` or `:reversed`. It is not stored in the deck.
 The deck remains a pure list of unoriented cards; orientation is a property of
 how a card was drawn.
 
-`tarot-card-meaning` uses `:reversed` on the drawn card to select the correct
+`tarot-card-meaning` uses `:orientation` on the drawn card to select the correct
 meaning string.
 
 ---

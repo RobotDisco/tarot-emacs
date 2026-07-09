@@ -103,14 +103,32 @@ For more details, see https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
 	      (aref deck-vec (1- ceiling)) rand-val)))
     (cl-coerce deck-vec 'list)))
 
-(defun tarot-draw (deck count)
+(defun tarot-draw (deck count &optional draw-fn)
   "Return the first COUNT cards from DECK, and remaining cards.
 
 Returns a two-element list:
 1. A list of cards drawn from the deck.
-2. A list of cards remaining in the deck."
-  (list (take count deck)
-	(drop count deck)))
+2. A list of cards remaining in the deck.
+
+Apply DRAW-FN to each drawn card if supplied.  Otherwise, apply
+`tarot--card-orient'."
+  (let ((f (or draw-fn #'tarot--card-orient)))
+    (list (mapcar f (take count deck))
+	  (drop count deck))))
+
+(defun tarot-card-orientation (card)
+  "Return card orientation for CARD.
+
+Values are either :upright or :reversed"
+  (plist-get card :orientation))
+
+(defun tarot--card-orient (card)
+  "Default function applied by `tarot-draw' to mutate every drawn CARD.
+
+For now, it assigns a random orientation to the card."
+  (plist-put card :orientation (if (zerop (cl-random 2))
+				   :upright
+				 :reversed)))
 
 (provide 'tarot)
 ;;; tarot.el ends here
