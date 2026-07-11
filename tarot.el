@@ -123,12 +123,12 @@ Values are either :upright or :reversed"
   (plist-get card :orientation))
 
 (defun tarot--card-orient (card)
-  "Default function applied by `tarot-draw' to mutate every drawn CARD.
+  "Assign random orientation to CARD and return a modified copy.
 
-For now, it assigns a random orientation to the card."
-  (plist-put card :orientation (if (zerop (cl-random 2))
-				   :upright
-				 :reversed)))
+This is the default function applied by `tarot-draw'."
+  (plist-put (copy-sequence card) :orientation (if (zerop (cl-random 2))
+						   :upright
+						 :reversed)))
 
 (provide 'tarot)
 ;;; tarot.el ends here
