@@ -109,6 +109,14 @@
       (should (cl-member :upright orientations))
       (should (cl-member :reversed orientations)))))
 
+(ert-deftest tarot-test-draw-does-not-modify-original-value ()
+  "The default tarot draw function does not mutate the original card."
+  (let* ((card '(:name "test card"))
+	 (deck (list card)))
+    (seq-let (drawn _) (tarot-draw deck 1)
+      (should (equal card '(:name "test card")))
+      (should-not (equal card (car drawn))))))
+
 ;;; Iteration 7 - Spreads and readings -----------------------------------------
 
 (ert-deftest tarot-test-draw-reading-fills-all-spread-positions ()
