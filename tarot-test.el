@@ -86,6 +86,14 @@
     (should (equal (append drawn remaining)
 		   tarot-deck))))
 
+(ert-deftest tarot-test-draw-too-many-cards ()
+  "Drawing too many cards returns empty list, leaving all cards as remaining."
+  (let ((request-num 10)
+	(cards '(one two three four five)))
+    (seq-let (drawn remaining) (tarot-draw cards request-num #'identity)
+      (should-not drawn)
+      (should (equal cards remaining)))))
+
 ;;; Iteration 6 - Card orientation ---------------------------------------------
 
 (ert-deftest tarot-test-draw-gives-cards-orientations ()
@@ -95,7 +103,7 @@
       (should (memq (tarot-card-orientation card) '(:upright :reversed))))))
 
 (ert-deftest tarot-test-draw-eventually-provides-upright-and-reversed-cards ()
-  "If a full deck is drawn, effectively guarantee upright and reversed cards."
+  "Drawing enough cards guarantees us some in upright and reversed positions."
   (seq-let (drawn _) (tarot-draw tarot-deck 78)
     (let ((orientations (mapcar #'tarot-card-orientation drawn)))
       (should (cl-member :upright orientations))

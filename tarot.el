@@ -106,15 +106,21 @@ For more details, see https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
 (defun tarot-draw (deck count &optional draw-fn)
   "Return the first COUNT cards from DECK, and remaining cards.
 
-Returns a two-element list:
+If the deck has enough cards, returns a two-element list:
 1. A list of cards drawn from the deck.
 2. A list of cards remaining in the deck.
 
+If the deck has less cards than the draw requests, return:
+1. An empty list.
+2. The list of remaining cards, unmodified.
+
 Apply DRAW-FN to each drawn card if supplied.  Otherwise, apply
 `tarot--card-orient'."
-  (let ((f (or draw-fn #'tarot--card-orient)))
-    (list (mapcar f (take count deck))
-	  (drop count deck))))
+  (if (< (length deck) count)
+      (cons nil (list deck))
+    (let ((f (or draw-fn #'tarot--card-orient)))
+      (cons (mapcar f (take count deck))
+	    (list (drop count deck))))))
 
 (defun tarot-card-orientation (card)
   "Return card orientation for CARD.
