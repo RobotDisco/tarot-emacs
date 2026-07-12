@@ -143,5 +143,13 @@
     (seq-let (reading remaining) (tarot-draw-reading cards spread #'identity)
       (should-not reading))))
 
+(ert-deftest tarot-test-spread-get-by-name ()
+  "`tarot-spreads-get' performs a name lookup from `tarot-spreads'."
+  (should (equal (tarot-spreads-get "Three Card") '("Past" "Present" "Future"))))
+
+(ert-deftest tarot-test-spread-nonexistent-name ()
+  "`tarot-spreads-get' returns nil when name isn't found in `tarot-spreads'."
+  (should-not (tarot-spreads-get "Non-existent spread")))
+
 (provide 'tarot-test)
 ;;; tarot-test.el ends here

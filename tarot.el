@@ -74,6 +74,11 @@
 				   collect (list :name (format "%s of %s" rank suit)))))
   "Non-shuffled tarot deck.")
 
+(defconst tarot-spreads
+  '(("Three Card" . ("Past" "Present" "Future"))
+    ("Celtic Cross" . ("Present" "Challenge" "Past" "Future" "Conscious" "Unconscious" "Self-perception" "External Influences" "Hopes & Fears" "Outcome")))
+  "Alist where the car is the spread name, the cdr a list of position strings.")
+
 
 ;;; Tarot card operations ------------------------------------------------------
 
@@ -147,6 +152,10 @@ inserting into the spread mapping instead of the default drawing function."
   (seq-let (drawn remaining) (tarot-draw deck (length spread) draw-fn)
     (cons (cl-mapcar #'cons spread drawn)
 	  (list remaining))))
+
+(defun tarot-spreads-get (name)
+  "Fetch spread from `tarot-spreads' by NAME.  Return nil if non-existent."
+  (alist-get name tarot-spreads nil nil #'equal))
 
 (provide 'tarot)
 ;;; tarot.el ends here
