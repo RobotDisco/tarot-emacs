@@ -109,5 +109,31 @@
       (should (cl-member :upright orientations))
       (should (cl-member :reversed orientations)))))
 
+;;; Iteration 7 - Spreads and readings -----------------------------------------
+
+(ert-deftest tarot-test-draw-reading-fills-all-spread-positions ()
+  "Drawing cards for a spread uses populates all spread positions."
+  (let* ((spread '("pos1" "pos2" "pos3"))
+	 (reading (car (tarot-draw-reading tarot-deck spread)))
+	 (rkeys (mapcar #'car reading)))
+    (should (= (length reading) (length spread)))
+    (dolist (key spread)
+      (should (member key rkeys)))))
+
+(ert-deftest tarot-test-draw-reading-draws-without-replacement ()
+  "Drawing into a spread never replaces cards in the deck."
+  (let ((spread (number-sequence 1 78)))
+    (seq-let (reading remaining) (tarot-draw-reading tarot-deck spread #'identity)
+      (should (= (length remaining) 0))
+      (let ((rcards (mapcar #'cdr reading)))
+	(should (equal rcards (cl-remove-duplicates rcards :test #'equal)))))))
+
+(ert-deftest tarot-test-draw-reading-too-many-cards ()
+  "Drawing too many cards returns nil reading."
+  (let ((spread '("pos1" "pos2" "pos3" "pos4" "pos5" "pos6" "pos7" "pos8"))
+	(cards '(one two three four five)))
+    (seq-let (reading remaining) (tarot-draw-reading cards spread #'identity)
+      (should-not reading))))
+
 (provide 'tarot-test)
 ;;; tarot-test.el ends here

@@ -17,7 +17,7 @@ major mode. Each task starts with a failing test.
 
 ---
 
-## Phase 1 — Pure Core
+## Phase 1 — Pure Core ✓
 
 Data and logic with no Emacs UI involved. Pure functions, pure data.
 
@@ -53,7 +53,7 @@ A function that takes a card and returns a new card with a randomly assigned
 orientation (upright or reversed). The original card is not modified. Orientation
 is stored as `:orientation :upright` or `:orientation :reversed` on the card plist.
 
-### Task 7: Spreads and readings ★ Learn by Doing
+### Task 7: Spreads and readings ★ Learn by Doing ✓
 Spread definitions (single card, three card, Celtic Cross — each with a name and
 a list of position labels). A function that takes a deck and a spread, draws the
 right number of cards, assigns each an orientation, and pairs each card with its

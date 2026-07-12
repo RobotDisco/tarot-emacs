@@ -136,5 +136,17 @@ This is the default function applied by `tarot-draw'."
 						   :upright
 						 :reversed)))
 
+(defun tarot-draw-reading (deck spread &optional draw-fn)
+  "Given a DECK of cards and a SPREAD of positions, return a reading.
+
+A reading is an alist where the car is the position key and the cdr is the card
+drawn in that position.
+
+If DRAW-FN is supplied, it is applied to every card that is drawn before
+inserting into the spread mapping instead of the default drawing function."
+  (seq-let (drawn remaining) (tarot-draw deck (length spread) draw-fn)
+    (cons (cl-mapcar #'cons spread drawn)
+	  (list remaining))))
+
 (provide 'tarot)
 ;;; tarot.el ends here
