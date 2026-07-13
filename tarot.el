@@ -15,6 +15,7 @@
 ;;; Code:
 (require 'cl-lib)
 
+(require 'tarot-meanings)
 
 ;;; Tarot card constants -------------------------------------------------------
 
@@ -156,6 +157,17 @@ inserting into the spread mapping instead of the default drawing function."
 (defun tarot-spreads-get (name)
   "Fetch spread from `tarot-spreads' by NAME.  Return nil if non-existent."
   (alist-get name tarot-spreads nil nil #'string-equal))
+
+(defun tarot-card-meaning (card)
+  "Retrieve the meaning for a drawn CARD.
+
+A prerequisite of this function is that the card has an assigned orientation."
+  (let ((cname (tarot-card-name card))
+	(corient (tarot-card-orientation card)))
+    (unless corient
+      (error ":orientation property required, %S provided" card))
+    (plist-get (alist-get cname tarot-meanings nil nil #'string-equal)
+	       corient)))
 
 (provide 'tarot)
 ;;; tarot.el ends here

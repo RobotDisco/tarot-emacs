@@ -12,6 +12,7 @@
 ;;; Code:
 (require 'ert)
 (require 'tarot)
+(require 'tarot-meanings)
 
 ;;; Iteration 1 - Test scaffolding ---------------------------------------------
 
@@ -150,6 +151,26 @@
 (ert-deftest tarot-test-spread-nonexistent-name ()
   "`tarot-spreads-get' returns nil when name isn't found in `tarot-spreads'."
   (should-not (tarot-spreads-get "Non-existent spread")))
+
+;;; Iteration 8 - Card Meanings ------------------------------------------------
+
+(ert-deftest tarot-test-meaning ()
+  "Test fetching card meanings by card name."
+  (let ((tarot-meanings
+	 '(("The Fool" . (:upright "something" :reversed "rsomething"))
+	   ("Five of Wands" . (:upright "something" :reversed "rsomething")))))
+    (should (string-equal (tarot-card-meaning '(:name "The Fool" :orientation :upright)) "something"))
+    (should (string-equal (tarot-card-meaning '(:name "The Fool" :orientation :reversed)) "rsomething"))
+    (should (string-equal (tarot-card-meaning '(:name "Five of Wands" :orientation :upright)) "something"))
+    (should (string-equal (tarot-card-meaning '(:name "Five of Wands" :orientation :reversed)) "rsomething"))
+    (should-not (tarot-card-meaning '(:name "Fifty-eight of Guitars" :orientation :upright)))))
+
+(ert-deftest tarot-test-meaning-undrawn-card ()
+  "Error when tarot-card-meaning is given a card lacking drawn orientation."
+  (let ((tarot-meanings
+	 '(("The Fool" . (:upright "something" :reversed "rsomething")))))
+    (should-error (tarot-card-meaning '(:name "The Fool")))))
+
 
 (provide 'tarot-test)
 ;;; tarot-test.el ends here
