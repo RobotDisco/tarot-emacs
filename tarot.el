@@ -155,7 +155,7 @@ inserting into the spread mapping instead of the default drawing function."
 
 (defun tarot-spreads-get (name)
   "Fetch spread from `tarot-spreads' by NAME.  Return nil if non-existent."
-  (alist-get name tarot-spreads nil nil #'equal))
+  (alist-get name tarot-spreads nil nil #'string-equal))
 
 (provide 'tarot)
 ;;; tarot.el ends here
