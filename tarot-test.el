@@ -171,6 +171,13 @@
 	 '(("The Fool" . (:upright "something" :reversed "rsomething")))))
     (should-error (tarot-card-meaning '(:name "The Fool")))))
 
+(ert-deftest tarot-test-meanings-for-every-standard-card ()
+  "There is a tarot-card-meaning for every standard card."
+  (dolist (card tarot-deck)
+    (dolist (orient '(:upright :reversed))
+      (should (tarot-card-meaning (plist-put (copy-sequence card)
+					     :orientation orient))))))
+
 
 (provide 'tarot-test)
 ;;; tarot-test.el ends here

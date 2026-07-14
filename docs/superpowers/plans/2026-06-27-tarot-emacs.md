@@ -44,7 +44,7 @@ remaining deck as a single return value.
 
 ---
 
-## Phase 2 — Readings & Data
+## Phase 2 — Readings & Data ✓
 
 Combining cards into readings, adding orientation, attaching meaning.
 
@@ -60,7 +60,7 @@ right number of cards, assigns each an orientation, and pairs each card with its
 position label. No card appears twice. The return shape should make display code
 natural to write.
 
-### Task 8: Meanings and multi-file packages
+### Task 8: Meanings and multi-file packages ✓
 A second file (`tarot-meanings.el`) containing original 2–3 sentence meanings for
 all 78 cards in both orientations, loaded via Elisp's `provide`/`require` module
 system. A function that looks up the correct meaning for a card given its
