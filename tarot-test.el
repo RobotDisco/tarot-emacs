@@ -178,6 +178,26 @@
       (should (tarot-card-meaning (plist-put (copy-sequence card)
 					     :orientation orient))))))
 
+;;; Iteration 9 - Tarot buffer mode --------------------------------------------
+
+(ert-deftest tarot-test-tarot-mode-exists ()
+  "We have a tarot buffer mode."
+  (with-temp-buffer
+    (tarot-mode)
+    (should (derived-mode-p 'special-mode))))
+
+(ert-deftest tarot-test-reading-opens-tarot-buffer ()
+  "Calling tarot-reading brings up a new dedicated tarot reading buffer."
+  (unwind-protect
+      (progn
+	(tarot-reading)
+	(let ((buffer (get-buffer "*tarot*")))
+	  (should buffer)
+	  (with-current-buffer buffer
+	    (should (derived-mode-p 'tarot-mode))
+	    (should (string-match-p "The Fool" (buffer-string))))))
+    (when (get-buffer "*tarot*")
+      (kill-buffer "*tarot*"))))
 
 (provide 'tarot-test)
 ;;; tarot-test.el ends here

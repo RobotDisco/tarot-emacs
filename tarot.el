@@ -81,6 +81,12 @@
   "Alist where the car is the spread name, the cdr a list of position strings.")
 
 
+;;; Tarot UI constants ---------------------------------------------------------
+
+(defconst tarot-buffer-name "*tarot*"
+  "Standard buffer name where tarot card readings are placed.")
+
+
 ;;; Tarot card operations ------------------------------------------------------
 
 (defun tarot-card-name (card)
@@ -168,6 +174,22 @@ A prerequisite of this function is that the card has an assigned orientation."
       (error ":orientation property required, %S provided" card))
     (plist-get (alist-get cname tarot-meanings nil nil #'string-equal)
 	       corient)))
+
+
+;;; Tarot UI mode --------------------------------------------------------------
+
+(define-derived-mode tarot-mode special-mode "Tarot"
+  "Major mode for tarot card readings.")
+
+(defun tarot-reading ()
+  "Perform a tarot reading."
+  (interactive)
+  (with-current-buffer (get-buffer-create tarot-buffer-name)
+    (tarot-mode)
+    (let ((inhibit-read-only t))
+      (erase-buffer)
+      (insert "The Fool"))
+    (pop-to-buffer tarot-buffer-name)))
 
 (provide 'tarot)
 ;;; tarot.el ends here

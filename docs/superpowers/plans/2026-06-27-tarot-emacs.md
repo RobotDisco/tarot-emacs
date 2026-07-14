@@ -72,7 +72,7 @@ orientation.
 
 Bringing the logic into an interactive Emacs buffer.
 
-### Task 9: Major mode and buffer basics
+### Task 9: Major mode and buffer basics ✓
 A major mode derived from `special-mode`. A stub interactive command that opens a
 dedicated `*tarot*` buffer using that mode and writes something into it.
 
