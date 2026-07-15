@@ -290,6 +290,27 @@ which is omitted from the other cards."
 				   'face 'tarot-meaning-face)
 		  "\n\n"))))))
 
+(defun tarot--move-card-focus (move-fn)
+  "Change focused card in the tarot reading UI buffer.
+
+`tarot--position-index' is mutated by applying MOVE-FN to its current value then
+accounting for wraparound in the available card positions in `tarot--reading'.
+
+`tarot--render' is invoked afterwards to redraw the buffer."
+  (setq-local tarot--position-index (mod (funcall move-fn tarot--position-index)
+					 (length tarot--reading)))
+  (tarot--render))
+
+(defun tarot-next-card ()
+  "Advance card focus in UI, with wraparound."
+  (interactive)
+  (tarot--move-card-focus #'1+))
+
+(defun tarot-prev-card ()
+  "Rewind card focus in UI, with wraparound."
+  (interactive)
+  (tarot--move-card-focus #'1-))
+
 
 (provide 'tarot)
 ;;; tarot.el ends here

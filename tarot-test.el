@@ -212,18 +212,23 @@
 
 ;;; Iteration 11 - Tarot UI rendering ------------------------------------------
 
-(defun tarot-test--render-helper (f)
-  "Helper for setting up fixtures for tarot--render.
+(defun tarot-test--render-helper (assertions-fn &optional start-idx)
+  "Set up fixtures for `tarot--render'.
 
-Supply closure F that executes test assertions."
-  (with-temp-buffer
-    (setq-local tarot--reading
-		'(("First" . (:name "The Fool" :orientation :upright))
-		  ("Second" . (:name "Five of Swords" :orientation :reversed))
-		  ("Third" . (:name "Wheel of Fortune" :orientation :upright)))
-		tarot--position-index 1)
-    (tarot--render)
-    (funcall f)))
+Supply closure ASSERTIONS-FN that executes test assertions.
+START-IDX sets focused card position, zero-indexed."
+  (let ((tarot-meanings
+	 '(("The Fool" :upright "New beginnings, spontaneity")
+	   ("Five of Swords" :reversed "Reckoning with the cost")
+	   ("Wheel of Fortune" :upright "Positive change, accepting change"))))
+    (with-temp-buffer
+      (setq-local tarot--reading
+		  '(("First" . (:name "The Fool" :orientation :upright))
+		    ("Second" . (:name "Five of Swords" :orientation :reversed))
+		    ("Third" . (:name "Wheel of Fortune" :orientation :upright)))
+		  tarot--position-index (or start-idx 1))
+      (tarot--render)
+      (funcall assertions-fn))))
 
 (ert-deftest tarot-test--render-spread-positions ()
   "Tarot--render displays spread position names."
@@ -321,21 +326,73 @@ Supply closure F that executes test assertions."
   (should-not (tarot-minor-arcana-p
 	       '(:name "Judgement" :orientation :upright))))
 
-;;; Iteration 13 - Tarot card meanings displayed in UI ------------------------
+
+;;; Iteration 12 - Cycling between focused cards -------------------------------
+
+(ert-deftest tarot-test-next-card-advances-focused-card ()
+  "Test advancing card focus."
+  (tarot-test--render-helper
+   (lambda ()
+     (should (= tarot--position-index 0))
+     (should (string-search "New beginnings, spontaneity"
+			    (buffer-string)))
+     (should-not (string-search "Reckoning with the cost" (buffer-string)))
+     (should-not (string-search "Positive change, accepting change"
+				(buffer-string)))
+
+     (tarot-next-card)
+
+     (should (= tarot--position-index 1))
+     (should-not (string-search "New beginnings, spontaneity"
+				(buffer-string)))
+     (should (string-search "Reckoning with the cost" (buffer-string)))
+     (should-not (string-search "Positive change, accepting change"
+				(buffer-string))))
+   0))
+
+(ert-deftest tarot-test-previous-card-rewinds-focused-card ()
+  "Test rewinding card focus."
+  (tarot-test--render-helper
+   (lambda ()
+     (should (= tarot--position-index 2))
+     (should-not (string-search "New beginnings, spontaneity"
+				(buffer-string)))
+     (should-not (string-search "Reckoning with the cost" (buffer-string)))
+     (should (string-search "Positive change, accepting change"
+			    (buffer-string)))
+
+     (tarot-prev-card)
+
+     (should (= tarot--position-index 1))
+     (should-not (string-search "New beginnings, spontaneity"
+				(buffer-string)))
+     (should (string-search "Reckoning with the cost" (buffer-string)))
+     (should-not (string-search "Positive change, accepting change"
+				(buffer-string))))
+   2))
+
+(ert-deftest tarot-test-next-previous-card-wraps-around-spread-sequence ()
+  "Test wrapping focused card across end and beginning of spread positions."
+  (tarot-test--render-helper
+   (lambda ()
+     (should (= tarot--position-index 2))
+     (tarot-next-card)
+     (should (= tarot--position-index 0))
+     (tarot-prev-card)
+     (should (= tarot--position-index 2)))
+   2))
+
+;;; Iteration 13 - Tarot card meanings displayed in UI -------------------------
 
 (ert-deftest tarot-test--render-card-meaning-for-selected-position ()
   "Only display tarot card meaning for the selected position in tarot--render."
-  (let ((tarot-meanings
-	 '(("The Fool" :upright "New beginnings, spontaneity")
-	   ("Five of Swords" :reversed "Reckoning with the cost")
-	   ("Wheel of Fortune" :upright "Positive change, accepting change"))))
-    (tarot-test--render-helper
-     (lambda ()
-       (should-not (string-search "New beginnings, spontaneity"
-				  (buffer-string)))
-       (should (string-search "Reckoning with the cost" (buffer-string)))
-       (should-not (string-search "Positive change, accepting change"
-				  (buffer-string)))))))
+  (tarot-test--render-helper
+   (lambda ()
+     (should-not (string-search "New beginnings, spontaneity"
+				(buffer-string)))
+     (should (string-search "Reckoning with the cost" (buffer-string)))
+     (should-not (string-search "Positive change, accepting change"
+				(buffer-string))))))
 
 
 (provide 'tarot-test)
