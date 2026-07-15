@@ -72,19 +72,69 @@
   (append tarot-major-arcana
 	  (cl-loop for suit in tarot-minor-suits
 		   append (cl-loop for rank in tarot-minor-ranks
-				   collect (list :name (format "%s of %s" rank suit)))))
+				   collect (list :name (format "%s of %s"
+							       rank
+							       suit)))))
   "Non-shuffled tarot deck.")
 
 (defconst tarot-spreads
   '(("Three Card" . ("Past" "Present" "Future"))
-    ("Celtic Cross" . ("Present" "Challenge" "Past" "Future" "Conscious" "Unconscious" "Self-perception" "External Influences" "Hopes & Fears" "Outcome")))
+    ("Celtic Cross" . ("Present"
+		       "Challenge"
+		       "Past"
+		       "Future"
+		       "Conscious"
+		       "Unconscious"
+		       "Self-perception"
+		       "External Influences"
+		       "Hopes & Fears"
+		       "Outcome")))
   "Alist where the car is the spread name, the cdr a list of position strings.")
 
 
-;;; Tarot UI constants ---------------------------------------------------------
+;;; Tarot UI data --------------------------------------------------------------
 
 (defconst tarot-buffer-name "*tarot*"
   "Standard buffer name where tarot card readings are placed.")
+
+(defvar-local tarot--reading nil
+  "Tarot reading for local buffer.")
+
+(defvar-local tarot--position-index nil
+  "Currently selected tarot card in local buffer.
+
+Used to display card meaning.")
+
+
+;;; Tarot customizations -------------------------------------------------------
+
+(defgroup tarot nil
+  "Customisation variables for tarot reading." :group 'games)
+
+
+(defface tarot-spread-position-face
+  '((t . (:inherit font-lock-function-name-face)))
+  "Face for tarot spread positions." :group 'tarot)
+
+(defface tarot-major-arcana-face
+  '((t . (:inherit font-lock-variable-name-face :weight bold)))
+  "Face for tarot major arcana." :group 'tarot)
+
+(defface tarot-minor-arcana-face
+  '((t . (:inherit font-lock-variable-name-face)))
+  "Face for tarot minor arcana." :group 'tarot)
+
+(defface tarot-meaning-face
+  '((t . (:inherit font-lock-string-face :box t)))
+  "Face for tarot card meanings." :group 'tarot)
+
+(defface tarot-upright-orientation-face
+  '((t . ()))
+  "Face to indicate this card was placed in upright orientation." :group 'tarot)
+
+(defface tarot-reversed-orientation-face
+  '((t . (:slant italic)))
+  "Face to indicate this card was placed in reverse orientation." :group 'tarot)
 
 
 ;;; Tarot card operations ------------------------------------------------------
@@ -140,6 +190,13 @@ Apply DRAW-FN to each drawn card if supplied.  Otherwise, apply
 Values are either :upright or :reversed"
   (plist-get card :orientation))
 
+(defun tarot-card-orientation-string (card)
+  "Return friendly string for drawn CARD orientation."
+  (let ((symbol (tarot-card-orientation card)))
+    (pcase symbol
+      (:upright "Upright")
+      (:reversed "Reversed"))))
+
 (defun tarot--card-orient (card)
   "Assign random orientation to CARD and return a modified copy.
 
@@ -175,6 +232,17 @@ A prerequisite of this function is that the card has an assigned orientation."
     (plist-get (alist-get cname tarot-meanings nil nil #'string-equal)
 	       corient)))
 
+(defun tarot-major-arcana-p (card)
+  "Determine whether CARD is a major arcana card."
+  (cl-member card tarot-major-arcana
+	     :test (lambda (x y)
+		     (string-equal (tarot-card-name x)
+				   (tarot-card-name y)))))
+
+(defun tarot-minor-arcana-p (card)
+  "Determine whether CARD is a minor arcana card."
+  (not (tarot-major-arcana-p card)))
+
 
 ;;; Tarot UI mode --------------------------------------------------------------
 
@@ -190,6 +258,38 @@ A prerequisite of this function is that the card has an assigned orientation."
       (erase-buffer)
       (insert "The Fool"))
     (pop-to-buffer tarot-buffer-name)))
+
+(defun tarot--render ()
+  "Render a tarot reading into buffer.
+
+Rendering is dependant on two buffer-local variables:
+1. `tarot--reading' is the tarot reading generated for this specific buffer.
+2. `tarot--position-index' is the currently selected card in the buffer.
+
+The currently selected position renders the meaning of the associated card,
+which is omitted from the other cards."
+  (save-excursion
+    (erase-buffer)
+    (dolist (cur tarot--reading)
+      (let ((spreadpos (car cur))
+	    (spreadcard (cdr cur)))
+	(insert (propertize spreadpos 'face 'tarot-spread-position-face) "\n")
+	(insert "  " (propertize (tarot-card-name spreadcard) 'face
+				 (if (tarot-major-arcana-p spreadcard)
+				     'tarot-major-arcana-face
+				   'tarot-minor-arcana-face)) "\n")
+	(insert "  "
+		(propertize (tarot-card-orientation-string spreadcard) 'face
+			    (pcase (tarot-card-orientation spreadcard)
+			      (:upright 'tarot-upright-orientation-face)
+			      (:reversed 'tarot-reversed-orientation-face)))
+		"\n")
+	(when (equal (cdr (nth tarot--position-index tarot--reading))
+		     spreadcard)
+	  (insert "\n" (propertize (tarot-card-meaning spreadcard)
+				   'face 'tarot-meaning-face)
+		  "\n\n"))))))
+
 
 (provide 'tarot)
 ;;; tarot.el ends here

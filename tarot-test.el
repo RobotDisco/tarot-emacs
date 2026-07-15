@@ -132,7 +132,9 @@
 (ert-deftest tarot-test-draw-reading-draws-without-replacement ()
   "Drawing into a spread never replaces cards in the deck."
   (let ((spread (number-sequence 1 78)))
-    (seq-let (reading remaining) (tarot-draw-reading tarot-deck spread #'identity)
+    (seq-let (reading remaining) (tarot-draw-reading tarot-deck
+						     spread
+						     #'identity)
       (should (= (length remaining) 0))
       (let ((rcards (mapcar #'cdr reading)))
 	(should (equal rcards (cl-remove-duplicates rcards :test #'equal)))))))
@@ -159,11 +161,20 @@
   (let ((tarot-meanings
 	 '(("The Fool" . (:upright "something" :reversed "rsomething"))
 	   ("Five of Wands" . (:upright "something" :reversed "rsomething")))))
-    (should (string-equal (tarot-card-meaning '(:name "The Fool" :orientation :upright)) "something"))
-    (should (string-equal (tarot-card-meaning '(:name "The Fool" :orientation :reversed)) "rsomething"))
-    (should (string-equal (tarot-card-meaning '(:name "Five of Wands" :orientation :upright)) "something"))
-    (should (string-equal (tarot-card-meaning '(:name "Five of Wands" :orientation :reversed)) "rsomething"))
-    (should-not (tarot-card-meaning '(:name "Fifty-eight of Guitars" :orientation :upright)))))
+    (should (string-equal
+	     (tarot-card-meaning '(:name "The Fool" :orientation :upright))
+	     "something"))
+    (should (string-equal
+	     (tarot-card-meaning '(:name "The Fool" :orientation :reversed))
+	     "rsomething"))
+    (should (string-equal
+	     (tarot-card-meaning '(:name "Five of Wands" :orientation :upright))
+	     "something"))
+    (should (string-equal
+	     (tarot-card-meaning '(:name "Five of Wands" :orientation :reversed))
+	     "rsomething"))
+    (should-not (tarot-card-meaning
+		 '(:name "Fifty-eight of Guitars" :orientation :upright)))))
 
 (ert-deftest tarot-test-meaning-undrawn-card ()
   "Error when tarot-card-meaning is given a card lacking drawn orientation."
@@ -198,6 +209,134 @@
 	    (should (string-match-p "The Fool" (buffer-string))))))
     (when (get-buffer "*tarot*")
       (kill-buffer "*tarot*"))))
+
+;;; Iteration 11 - Tarot UI rendering ------------------------------------------
+
+(defun tarot-test--render-helper (f)
+  "Helper for setting up fixtures for tarot--render.
+
+Supply closure F that executes test assertions."
+  (with-temp-buffer
+    (setq-local tarot--reading
+		'(("First" . (:name "The Fool" :orientation :upright))
+		  ("Second" . (:name "Five of Swords" :orientation :reversed))
+		  ("Third" . (:name "Wheel of Fortune" :orientation :upright)))
+		tarot--position-index 1)
+    (tarot--render)
+    (funcall f)))
+
+(ert-deftest tarot-test--render-spread-positions ()
+  "Tarot--render displays spread position names."
+  (tarot-test--render-helper
+   (lambda ()
+     (should (string-match-p "First" (buffer-string)))
+     (should (string-match-p "Second" (buffer-string)))
+     (should (string-match-p "Third" (buffer-string))))))
+
+(ert-deftest tarot-test--render-card-names ()
+  "Tarot--render displays card names."
+  (tarot-test--render-helper
+   (lambda ()
+     (should (string-match-p "The Fool" (buffer-string)))
+     (should (string-match-p "Five of Swords" (buffer-string)))
+     (should (string-match-p "Wheel of Fortune" (buffer-string))))))
+
+(ert-deftest tarot-test--render-spread-position-face ()
+  "Correct faces should be rendered by tarot--render."
+  (tarot-test--render-helper
+   (lambda ()
+     (dolist (posstr '("First" "Second" "Third"))
+       (goto-char (point-min))
+       (search-forward posstr)
+       (should (eq (get-text-property (match-beginning 0) 'face)
+		   'tarot-spread-position-face))))))
+
+(ert-deftest tarot-test--render-card-name-faces ()
+  "Correct faces should be rendered by tarot--render."
+  (tarot-test--render-helper
+   (lambda ()
+     (dolist (cardname '("The Fool" "Wheel of Fortune"))
+       (goto-char (point-min))
+       (search-forward cardname)
+       (should (eq (get-text-property (match-beginning 0) 'face)
+		   'tarot-major-arcana-face)))
+     (dolist (cardname '("Five of Swords"))
+       (goto-char (point-min))
+       (search-forward cardname)
+       (should (eq (get-text-property (match-beginning 0) 'face)
+		   'tarot-minor-arcana-face))))))
+
+(ert-deftest tarot-test--render-card-upright-orientation-face ()
+  "Correct faces should be rendered by tarot--render."
+  (tarot-test--render-helper
+   (lambda ()
+     (goto-char (point-min))
+     (while (search-forward "Upright" nil t)
+       (should (eq (get-text-property (match-beginning 0) 'face)
+		   'tarot-upright-orientation-face))))))
+
+(ert-deftest tarot-test--render-card-reversed-orientation-face ()
+  "Correct faces should be rendered by tarot--render."
+  (tarot-test--render-helper
+   (lambda ()
+     (goto-char (point-min))
+     (while (search-forward "Reversed" nil t)
+       (should (eq (get-text-property (match-beginning 0) 'face)
+		   'tarot-reversed-orientation-face))))))
+
+(ert-deftest tarot-test--render-card-meaning-face ()
+  "Correct faces should be rendered by tarot--render."
+  (tarot-test--render-helper
+   (lambda ()
+     (goto-char (point-min))
+     (search-forward "Reckoning with the cost")
+     (should (eq (get-text-property (match-beginning 0) 'face)
+		 'tarot-meaning-face)))))
+
+;;; Iteration 11.5 - Tarot card functions needed for UI ------------------------
+
+(ert-deftest tarot-test-card-orientation-string ()
+  "Return friendly string for a card's orientation keyword."
+  (should (string-equal (tarot-card-orientation-string
+			 '(:name "The Fool" :orientation :upright))
+			"Upright"))
+  (should (string-equal (tarot-card-orientation-string
+			 '(:name "The Fool" :orientation :reversed))
+			"Reversed")))
+
+(ert-deftest tarot-test-major-arcana-p ()
+  "Determine whether a card is a major arcana card."
+  (should (tarot-major-arcana-p '(:name "The Fool")))
+  (should (tarot-major-arcana-p '(:name "Judgement" :orientation :upright)))
+  (should-not (tarot-major-arcana-p '(:name "Five of Pentacles")))
+  (should-not (tarot-major-arcana-p
+	       '(:name "King of Cups" :orientation :reversed))))
+
+(ert-deftest tarot-test-minor-arcana-p ()
+  "Determine whether a card is a minor arcana card."
+  (should (tarot-minor-arcana-p '(:name "Five of Pentacles")))
+  (should (tarot-minor-arcana-p
+	   '(:name "King of Cups" :orientation :reversed)))
+  (should-not (tarot-minor-arcana-p '(:name "The Fool")))
+  (should-not (tarot-minor-arcana-p
+	       '(:name "Judgement" :orientation :upright))))
+
+;;; Iteration 13 - Tarot card meanings displayed in UI ------------------------
+
+(ert-deftest tarot-test--render-card-meaning-for-selected-position ()
+  "Only display tarot card meaning for the selected position in tarot--render."
+  (let ((tarot-meanings
+	 '(("The Fool" :upright "New beginnings, spontaneity")
+	   ("Five of Swords" :reversed "Reckoning with the cost")
+	   ("Wheel of Fortune" :upright "Positive change, accepting change"))))
+    (tarot-test--render-helper
+     (lambda ()
+       (should-not (string-search "New beginnings, spontaneity"
+				  (buffer-string)))
+       (should (string-search "Reckoning with the cost" (buffer-string)))
+       (should-not (string-search "Positive change, accepting change"
+				  (buffer-string)))))))
+
 
 (provide 'tarot-test)
 ;;; tarot-test.el ends here

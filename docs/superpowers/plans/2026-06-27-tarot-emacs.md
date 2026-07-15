@@ -76,12 +76,12 @@ Bringing the logic into an interactive Emacs buffer.
 A major mode derived from `special-mode`. A stub interactive command that opens a
 dedicated `*tarot*` buffer using that mode and writes something into it.
 
-### Task 10: Faces
+### Task 10: Faces ✓
 A customization group and faces for: spread position labels, major arcana card
 names, minor arcana card names, and reversed orientation indicators. No new tests —
 faces are exercised in the render step.
 
-### Task 11: Buffer-local state and rendering
+### Task 11: Buffer-local state and rendering ✓
 Buffer-local variables holding the active reading and the currently selected
 position index. A render function that erases the buffer and redraws from those
 variables — showing all positions, card names, and orientation for each, with a
@@ -91,7 +91,7 @@ visual indicator on the selected position.
 Commands to move forward and backward through positions, wrapping at either end.
 Bound to keys in the mode keymap. Each navigation call rerenders the buffer.
 
-### Task 13: Meanings display
+### Task 13: Meanings display ✓
 Extend the render function to show the meaning text for the currently selected
 position only. Unselected positions show name and orientation but not meaning.
 
