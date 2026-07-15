@@ -388,6 +388,12 @@ START-IDX sets focused card position, zero-indexed."
      (should (= tarot--position-index 2)))
    2))
 
+(ert-deftest tarot-test-keybinding-for-card-focus-cycling ()
+  "Test keybindings for UI card focus cycling."
+  (should (eq (lookup-key tarot-mode-map (kbd "n")) #'tarot-next-card))
+  (should (eq (lookup-key tarot-mode-map (kbd "p")) #'tarot-prev-card)))
+
+
 ;;; Iteration 13 - Tarot card meanings displayed in UI -------------------------
 
 (ert-deftest tarot-test--render-card-meaning-for-selected-position ()

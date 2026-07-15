@@ -249,6 +249,9 @@ A prerequisite of this function is that the card has an assigned orientation."
 (define-derived-mode tarot-mode special-mode "Tarot"
   "Major mode for tarot card readings.")
 
+(define-key tarot-mode-map (kbd "p") #'tarot-prev-card)
+(define-key tarot-mode-map (kbd "n") #'tarot-next-card)
+
 (defun tarot-reading ()
   "Perform a tarot reading."
   (interactive)

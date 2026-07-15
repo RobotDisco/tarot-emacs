@@ -87,7 +87,7 @@ position index. A render function that erases the buffer and redraws from those
 variables — showing all positions, card names, and orientation for each, with a
 visual indicator on the selected position.
 
-### Task 12: Navigation
+### Task 12: Navigation ✓
 Commands to move forward and backward through positions, wrapping at either end.
 Bound to keys in the mode keymap. Each navigation call rerenders the buffer.
 
