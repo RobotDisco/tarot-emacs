@@ -78,7 +78,13 @@
 							       suit)))))
   "Non-shuffled tarot deck.")
 
-(defconst tarot-spreads
+
+;;; Tarot customizations -------------------------------------------------------
+
+(defgroup tarot nil
+  "Customisation variables for tarot reading." :group 'games)
+
+(defcustom tarot-spreads
   '(("Three Card" . ("Past" "Present" "Future"))
     ("Celtic Cross" . ("Present"
 		       "Challenge"
@@ -90,13 +96,10 @@
 		       "External Influences"
 		       "Hopes & Fears"
 		       "Outcome")))
-  "Alist where the car is the spread name, the cdr a list of position strings.")
+  "Alist where the car is the spread name, the cdr a list of position strings."
+  :group 'tarot
+  :type '(alist :key-type string :value-type (repeat string)))
 
-
-;;; Tarot customizations -------------------------------------------------------
-
-(defgroup tarot nil
-  "Customisation variables for tarot reading." :group 'games)
 
 (defface tarot-spread-position-face
   '((t . (:inherit font-lock-function-name-face)))

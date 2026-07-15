@@ -148,11 +148,15 @@
 
 (ert-deftest tarot-test-spread-get-by-name ()
   "`tarot-spreads-get' performs a name lookup from `tarot-spreads'."
-  (should (equal (tarot-spreads-get "Three Card") '("Past" "Present" "Future"))))
+  (let ((tarot-spreads '(("Three Card" . ("Past" "Present" "Future"))
+			 ("One Card" . ("Card")))))
+    (should
+     (equal (tarot-spreads-get "Three Card") '("Past" "Present" "Future")))))
 
 (ert-deftest tarot-test-spread-nonexistent-name ()
   "`tarot-spreads-get' returns nil when name isn't found in `tarot-spreads'."
-  (should-not (tarot-spreads-get "Non-existent spread")))
+  (let ((tarot-spreads '(("Three Card" . ("Past" "Present" "Future")))))
+    (should-not (tarot-spreads-get "Non-existent spread"))))
 
 ;;; Iteration 8 - Card Meanings ------------------------------------------------
 
