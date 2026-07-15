@@ -334,20 +334,24 @@ START-IDX sets focused card position, zero-indexed."
   (tarot-test--render-helper
    (lambda ()
      (should (= tarot--position-index 0))
-     (should (string-search "New beginnings, spontaneity"
-			    (buffer-string)))
-     (should-not (string-search "Reckoning with the cost" (buffer-string)))
-     (should-not (string-search "Positive change, accepting change"
-				(buffer-string)))
+     (should (string-match-p (regexp-quote "New beginnings, spontaneity")
+			     (buffer-string)))
+     (should-not (string-match-p (regexp-quote "Reckoning with the cost")
+				 (buffer-string)))
+     (should-not (string-match-p (regexp-quote
+				  "Positive change, accepting change")
+				 (buffer-string)))
 
      (tarot-next-card)
 
      (should (= tarot--position-index 1))
-     (should-not (string-search "New beginnings, spontaneity"
-				(buffer-string)))
-     (should (string-search "Reckoning with the cost" (buffer-string)))
-     (should-not (string-search "Positive change, accepting change"
-				(buffer-string))))
+     (should-not (string-match-p (regexp-quote "New beginnings, spontaneity")
+				 (buffer-string)))
+     (should (string-match-p (regexp-quote "Reckoning with the cost")
+			     (buffer-string)))
+     (should-not (string-match-p (regexp-quote
+				  "Positive change, accepting change")
+				 (buffer-string))))
    0))
 
 (ert-deftest tarot-test-previous-card-rewinds-focused-card ()
@@ -355,20 +359,22 @@ START-IDX sets focused card position, zero-indexed."
   (tarot-test--render-helper
    (lambda ()
      (should (= tarot--position-index 2))
-     (should-not (string-search "New beginnings, spontaneity"
-				(buffer-string)))
-     (should-not (string-search "Reckoning with the cost" (buffer-string)))
-     (should (string-search "Positive change, accepting change"
-			    (buffer-string)))
+     (should-not (string-match-p (regexp-quote "New beginnings, spontaneity")
+				 (buffer-string)))
+     (should-not (string-match-p (regexp-quote "Reckoning with the cost")
+				 (buffer-string)))
+     (should (string-match-p (regexp-quote "Positive change, accepting change")
+			     (buffer-string)))
 
      (tarot-prev-card)
 
      (should (= tarot--position-index 1))
-     (should-not (string-search "New beginnings, spontaneity"
-				(buffer-string)))
-     (should (string-search "Reckoning with the cost" (buffer-string)))
-     (should-not (string-search "Positive change, accepting change"
-				(buffer-string))))
+     (should-not (string-match-p (regexp-quote "New beginnings, spontaneity")
+				 (buffer-string)))
+     (should (string-match-p (regexp-quote "Reckoning with the cost")
+			     (buffer-string)))
+     (should-not (string-match-p (regexp-quote "Positive change, accepting change")
+				 (buffer-string))))
    2))
 
 (ert-deftest tarot-test-next-previous-card-wraps-around-spread-sequence ()
@@ -388,11 +394,13 @@ START-IDX sets focused card position, zero-indexed."
   "Only display tarot card meaning for the selected position in tarot--render."
   (tarot-test--render-helper
    (lambda ()
-     (should-not (string-search "New beginnings, spontaneity"
-				(buffer-string)))
-     (should (string-search "Reckoning with the cost" (buffer-string)))
-     (should-not (string-search "Positive change, accepting change"
-				(buffer-string))))))
+     (should-not (string-match-p (regexp-quote "New beginnings, spontaneity")
+				 (buffer-string)))
+     (should (string-match-p (regexp-quote "Reckoning with the cost")
+			     (buffer-string)))
+     (should-not (string-match-p (regexp-quote
+				  "Positive change, accepting change")
+				 (buffer-string))))))
 
 
 (provide 'tarot-test)
