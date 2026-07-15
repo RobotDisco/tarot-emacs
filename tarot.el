@@ -17,6 +17,7 @@
 
 (require 'tarot-meanings)
 
+
 ;;; Tarot card constants -------------------------------------------------------
 
 (defconst tarot-major-arcana
@@ -92,25 +93,10 @@
   "Alist where the car is the spread name, the cdr a list of position strings.")
 
 
-;;; Tarot UI data --------------------------------------------------------------
-
-(defconst tarot-buffer-name "*tarot*"
-  "Standard buffer name where tarot card readings are placed.")
-
-(defvar-local tarot--reading nil
-  "Tarot reading for local buffer.")
-
-(defvar-local tarot--position-index nil
-  "Currently selected tarot card in local buffer.
-
-Used to display card meaning.")
-
-
 ;;; Tarot customizations -------------------------------------------------------
 
 (defgroup tarot nil
   "Customisation variables for tarot reading." :group 'games)
-
 
 (defface tarot-spread-position-face
   '((t . (:inherit font-lock-function-name-face)))
@@ -245,6 +231,17 @@ A prerequisite of this function is that the card has an assigned orientation."
 
 
 ;;; Tarot UI mode --------------------------------------------------------------
+
+(defconst tarot-buffer-name "*tarot*"
+  "Standard buffer name where tarot card readings are placed.")
+
+(defvar-local tarot--reading nil
+  "Tarot reading for local buffer.")
+
+(defvar-local tarot--position-index nil
+  "Currently selected tarot card in local buffer.
+
+Used to display card meaning.")
 
 (define-derived-mode tarot-mode special-mode "Tarot"
   "Major mode for tarot card readings.")
