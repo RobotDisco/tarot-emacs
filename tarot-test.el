@@ -143,7 +143,7 @@
   "Drawing too many cards returns nil reading."
   (let ((spread '("pos1" "pos2" "pos3" "pos4" "pos5" "pos6" "pos7" "pos8"))
 	(cards '(one two three four five)))
-    (seq-let (reading remaining) (tarot-draw-reading cards spread #'identity)
+    (seq-let (reading _) (tarot-draw-reading cards spread #'identity)
       (should-not reading))))
 
 (ert-deftest tarot-test-spread-get-by-name ()
@@ -179,6 +179,18 @@
 	     "rsomething"))
     (should-not (tarot-card-meaning
 		 '(:name "Fifty-eight of Guitars" :orientation :upright)))))
+
+(ert-deftest tarot-test-meaning-suppressed-reversed-orientation ()
+  "Test fetching card meanings when reversed orientations are suppressed."
+  (let ((tarot-show-reversed-orientation nil)
+	(tarot-meanings
+	 '(("The Fool" . (:upright "something" :reversed "rsomething")))))
+    (should (string-equal (tarot-card-meaning
+			   '(:name "The Fool" :orientation :upright))
+			  "something"))
+    (should (string-equal (tarot-card-meaning
+			   '(:name "The Fool" :orientation :reversed))
+			  "something"))))
 
 (ert-deftest tarot-test-meaning-undrawn-card ()
   "Error when tarot-card-meaning is given a card lacking drawn orientation."
@@ -223,7 +235,9 @@ Supply closure ASSERTIONS-FN that executes test assertions.
 START-IDX sets focused card position, zero-indexed."
   (let ((tarot-meanings
 	 '(("The Fool" :upright "New beginnings, spontaneity")
-	   ("Five of Swords" :reversed "Reckoning with the cost")
+	   ("Five of Swords"
+	    :upright "Hollow victory, costly conflict"
+	    :reversed "Reckoning with the cost")
 	   ("Wheel of Fortune" :upright "Positive change, accepting change"))))
     (with-temp-buffer
       (setq-local tarot--reading
@@ -293,14 +307,6 @@ START-IDX sets focused card position, zero-indexed."
        (should (eq (get-text-property (match-beginning 0) 'face)
 		   'tarot-reversed-orientation-face))))))
 
-(ert-deftest tarot-test--render-card-meaning-face ()
-  "Correct faces should be rendered by tarot--render."
-  (tarot-test--render-helper
-   (lambda ()
-     (goto-char (point-min))
-     (search-forward "Reckoning with the cost")
-     (should (eq (get-text-property (match-beginning 0) 'face)
-		 'tarot-meaning-face)))))
 
 ;;; Iteration 11.5 - Tarot card functions needed for UI ------------------------
 
@@ -312,6 +318,35 @@ START-IDX sets focused card position, zero-indexed."
   (should (string-equal (tarot-card-orientation-string
 			 '(:name "The Fool" :orientation :reversed))
 			"Reversed")))
+
+(ert-deftest tarot-test-card-orientation-string-reversed-suppressed ()
+  "Return friendly string for a card's orientation with reversed suppressed."
+  (let ((tarot-show-reversed-orientation nil))
+    (should (string-equal (tarot-card-orientation-string
+			   '(:name "The Fool" :orientation :upright))
+			  "Upright"))
+    (should (string-equal (tarot-card-orientation-string
+			   '(:name "The Fool" :orientation :reversed))
+			  "Upright"))))
+
+(ert-deftest tarot-test-card-orientation-face ()
+  "Return the face for a card's orientation keyword."
+  (should (eq (tarot-card-orientation-face
+	       '(:name "The Fool" :orientation :upright))
+	      'tarot-upright-orientation-face))
+  (should (eq (tarot-card-orientation-face
+	       '(:name "The Fool" :orientation :reversed))
+	      'tarot-reversed-orientation-face)))
+
+(ert-deftest tarot-test-card-orientation-face-reversed-suppressed ()
+  "Return the face for a card's orientation with reversed suppressed."
+  (let ((tarot-show-reversed-orientation nil))
+    (should (eq (tarot-card-orientation-face
+		 '(:name "The Fool" :orientation :upright))
+		'tarot-upright-orientation-face))
+    (should (eq (tarot-card-orientation-face
+		 '(:name "The Fool" :orientation :reversed))
+		'tarot-upright-orientation-face))))
 
 (ert-deftest tarot-test-major-arcana-p ()
   "Determine whether a card is a major arcana card."
@@ -412,6 +447,59 @@ START-IDX sets focused card position, zero-indexed."
 				  "Positive change, accepting change")
 				 (buffer-string))))))
 
+
+;;; Iteration 14 - Optionally suppress reversed card orientation ---------------
+
+(ert-deftest tarot-test--render-card-meaning-face ()
+  "Correct faces should be rendered by tarot--render."
+  (tarot-test--render-helper
+   (lambda ()
+     ;; Should find reversed meaning for focused card.
+     (goto-char (point-min))
+     (search-forward "Reckoning with the cost")
+     (should (eq (get-text-property (match-beginning 0) 'face)
+		 'tarot-meaning-face))
+     ;; Should not find upright meaning for focused card.
+     (goto-char (point-min))
+     (should-error (search-forward "Hollow victory, costly conflict")))))
+
+(ert-deftest tarot-test-we-can-suppress-reversed-orientation ()
+  "We can suppress reversed orientations using tarot-show-reversed-orientation."
+  (let ((tarot-show-reversed-orientation nil))
+    (tarot-test--render-helper
+     (lambda ()
+       ;; Should find upright meaning for focused card.
+       (goto-char (point-min))
+       (search-forward "Hollow victory, costly conflict")
+       (should (eq (get-text-property (match-beginning 0) 'face)
+		   'tarot-meaning-face))
+       ;; Should not find reversed meaning for focused card.
+       (goto-char (point-min))
+       (should-error (search-forward "Reckoning with the cost"))
+       (goto-char (point-min))
+       (should-error (search-forward "Reversed"))))))
+
+(ert-deftest tarot-test-show-reversed-orientation-if-set ()
+  "Show reversed orientations if customisation value enabled."
+  (let ((tarot-show-reversed-orientation t))
+    (should (eq (tarot--card-display-orientation
+		 '(:name "The Fool" :orientation :upright))
+		:upright))
+    (should (eq (tarot--card-display-orientation
+		 '(:name "The Fool" :orientation :reversed))
+		:reversed))
+    (should-not (tarot--card-display-orientation '(:name "The Fool")))))
+
+(ert-deftest tarot-test-dont-show-reversed-orientation-if-unset ()
+  "Don't show reversed orientation if customisation value disabled."
+  (let ((tarot-show-reversed-orientation nil))
+    (should (eq (tarot--card-display-orientation
+		 '(:name "The Fool" :orientation :upright))
+		:upright))
+    (should (eq (tarot--card-display-orientation
+		 '(:name "The Fool" :orientation :reversed))
+		:upright))
+    (should-not (tarot--card-display-orientation '(:name "The Fool")))))
 
 (provide 'tarot-test)
 ;;; tarot-test.el ends here

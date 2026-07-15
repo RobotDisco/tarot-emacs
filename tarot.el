@@ -100,6 +100,13 @@
   :group 'tarot
   :type '(alist :key-type string :value-type (repeat string)))
 
+(defcustom tarot-show-reversed-orientation
+  t
+  "Non-nil means show a card's true reversed orientation and meaning.
+
+When nil, reversed cards are suppressed and always displayed as upright."
+  :group 'tarot
+  :type 'boolean)
 
 (defface tarot-spread-position-face
   '((t . (:inherit font-lock-function-name-face)))
@@ -181,10 +188,16 @@ Values are either :upright or :reversed"
 
 (defun tarot-card-orientation-string (card)
   "Return friendly string for drawn CARD orientation."
-  (let ((symbol (tarot-card-orientation card)))
+  (let ((symbol (tarot--card-display-orientation card)))
     (pcase symbol
       (:upright "Upright")
       (:reversed "Reversed"))))
+
+(defun tarot-card-orientation-face (card)
+  "Return the face for drawn CARD orientation."
+  (pcase (tarot--card-display-orientation card)
+    (:upright 'tarot-upright-orientation-face)
+    (:reversed 'tarot-reversed-orientation-face)))
 
 (defun tarot--card-orient (card)
   "Assign random orientation to CARD and return a modified copy.
@@ -215,7 +228,7 @@ inserting into the spread mapping instead of the default drawing function."
 
 A prerequisite of this function is that the card has an assigned orientation."
   (let ((cname (tarot-card-name card))
-	(corient (tarot-card-orientation card)))
+	(corient (tarot--card-display-orientation card)))
     (unless corient
       (error ":orientation property required, %S provided" card))
     (plist-get (alist-get cname tarot-meanings nil nil #'string-equal)
@@ -282,10 +295,9 @@ which is omitted from the other cards."
 				     'tarot-major-arcana-face
 				   'tarot-minor-arcana-face)) "\n")
 	(insert "  "
-		(propertize (tarot-card-orientation-string spreadcard) 'face
-			    (pcase (tarot-card-orientation spreadcard)
-			      (:upright 'tarot-upright-orientation-face)
-			      (:reversed 'tarot-reversed-orientation-face)))
+		(propertize (tarot-card-orientation-string spreadcard)
+			    'face
+			    (tarot-card-orientation-face spreadcard))
 		"\n")
 	(when (equal (cdr (nth tarot--position-index tarot--reading))
 		     spreadcard)
@@ -313,6 +325,16 @@ accounting for wraparound in the available card positions in `tarot--reading'.
   "Rewind card focus in UI, with wraparound."
   (interactive)
   (tarot--move-card-focus #'1-))
+
+(defun tarot--card-display-orientation (card)
+  "Orientation accessor for CARD, factoring in display suppression options.
+
+If `tarot-show-reversed-orientation' is unset, return :upright in place of
+:reversed orientation values."
+  (if-let (orientation (tarot-card-orientation card))
+      (if tarot-show-reversed-orientation
+	  orientation
+	:upright)))
 
 
 (provide 'tarot)

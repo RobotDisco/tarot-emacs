@@ -99,9 +99,13 @@ position only. Unselected positions show name and orientation but not meaning.
 
 ## Phase 4 — Polish
 
-### Task 14: Customization
-User-configurable options: which spreads are available, and whether reversed cards
-show their distinct reversed meaning or always show upright.
+### Task 14: Customization ✓
+User-configurable options via `defcustom`: `tarot-spreads` is directly editable,
+letting users add, remove, or redefine spreads rather than choosing from a fixed
+set. `tarot-show-reversed-orientation` controls whether reversed cards display
+their true reversed orientation and meaning, or are suppressed and always shown
+as upright — suppression happens at display time only; the card's actual drawn
+orientation is unaffected.
 
 ### Task 15: Full interactive command
 Replace the stub command with the complete entry point: prompt the user to choose
