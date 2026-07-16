@@ -68,7 +68,7 @@ orientation.
 
 ---
 
-## Phase 3 — Emacs UI
+## Phase 3 — Emacs UI ✓
 
 Bringing the logic into an interactive Emacs buffer.
 
@@ -97,7 +97,7 @@ position only. Unselected positions show name and orientation but not meaning.
 
 ---
 
-## Phase 4 — Polish
+## Phase 4 — Polish ✓
 
 ### Task 14: Customization ✓
 User-configurable options via `defcustom`: `tarot-spreads` is directly editable,
@@ -107,7 +107,7 @@ their true reversed orientation and meaning, or are suppressed and always shown
 as upright — suppression happens at display time only; the card's actual drawn
 orientation is unaffected.
 
-### Task 15: Full interactive command
+### Task 15: Full interactive command ✓
 Replace the stub command with the complete entry point: prompt the user to choose
 a spread, shuffle a fresh deck, draw a reading, and render it. Everything wired
 together end to end.
