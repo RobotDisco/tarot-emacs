@@ -218,24 +218,25 @@
 
   ;; Disable the use of reversed cards, because it makes testing deterministic.
   (let ((tarot-show-reversed-orientation nil))
-    (unwind-protect
-	(progn
-	  (tarot-reading)
-	  (let ((buffer (get-buffer "*tarot*")))
-	    ;; We should have a buffer named "*tarot*"
-	    (should buffer)
-	    (with-current-buffer buffer
-	      ;; "*tarot* buffer should be using our tarot major mode.
-	      (should (derived-mode-p 'tarot-mode))
-	      ;; Go to beginning of buffer
-	      (goto-char (point-min))
-	      ;; Test the top three cards in our deck, as we have fed an
-	      ;; non-shuffled deck into our test invocation
-	      (should (search-forward "The Fool"))
-	      (should (search-forward "The Magician"))
-	      (should (search-forward "The High Priestess")))))
-      (when (get-buffer "*tarot*")
-	(kill-buffer "*tarot*")))))
+    (cl-letf (((symbol-function 'tarot-shuffle) #'identity))
+      (unwind-protect
+	  (progn
+	    (tarot-reading)
+	    (let ((buffer (get-buffer "*tarot*")))
+	      ;; We should have a buffer named "*tarot*"
+	      (should buffer)
+	      (with-current-buffer buffer
+		;; "*tarot* buffer should be using our tarot major mode.
+		(should (derived-mode-p 'tarot-mode))
+		;; Go to beginning of buffer
+		(goto-char (point-min))
+		;; Test the top three cards in our deck, as we have fed an
+		;; non-shuffled deck into our test invocation
+		(should (search-forward "The Fool"))
+		(should (search-forward "The Magician"))
+		(should (search-forward "The High Priestess")))))
+	(when (get-buffer "*tarot*")
+	  (kill-buffer "*tarot*"))))))
 
 ;;; Iteration 11 - Tarot UI rendering ------------------------------------------
 
