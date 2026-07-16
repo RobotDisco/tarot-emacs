@@ -97,7 +97,8 @@
 		       "Self-perception"
 		       "External Influences"
 		       "Hopes & Fears"
-		       "Outcome")))
+		       "Outcome"))
+    ("Single Card" . ("Card")))
   "Alist where the car is the spread name, the cdr a list of position strings."
   :group 'tarot
   :type '(alist :key-type string :value-type (repeat string)))

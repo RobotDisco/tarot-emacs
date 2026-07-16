@@ -7,9 +7,9 @@ tarot-emacs shuffles a standard 78-card deck and lays out readings
 ("spreads") in a dedicated buffer, with random upright/reversed
 orientation and a meaning shown for the focused card.
 
-Two spreads are provided: A three card "Past/Present/Future" spread and a
-traditional "Celtic Cross" spread ship by default; the set of spreads is
-fully customisable.
+Three spreads are provided: A single card spread, a three card
+"Past/Present/Future" spread, and a traditional "Celtic Cross" spread ship by
+default; the set of spreads is fully customisable.
 
 The card meanings in =tarot-meanings.el= are deliberately written at
 the level of themes and energies rather than concrete fortune-telling
