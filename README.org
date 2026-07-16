@@ -23,8 +23,9 @@ Not yet on MELPA. Install from source, e.g. with =use-package= and
 =straight.el=:
 
 #+begin_src emacs-lisp
-(use-package tarot
-  :straight (tarot :type git :host github :repo "RobotDisco/tarot-emacs"))
+  (use-package tarot
+    :straight (tarot :type git :host github :repo "RobotDisco/tarot-emacs")
+    :commands tarot-reading)
 #+end_src
 
 Or clone it and add it to your load path directly:
@@ -34,8 +35,9 @@ git clone https://github.com/RobotDisco/tarot-emacs ~/.emacs.d/site-lisp/tarot-e
 #+end_src
 
 #+begin_src emacs-lisp
-(use-package tarot
-  :load-path "~/.emacs.d/site-lisp/tarot-emacs")
+  (use-package tarot
+    :load-path "~/.emacs.d/site-lisp/tarot-emacs"
+    :commands tarot-reading)
 #+end_src
 
 Requires Emacs 26.1 or newer.

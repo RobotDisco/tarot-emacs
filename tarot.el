@@ -267,6 +267,7 @@ Used to display card meaning.")
 (define-key tarot-mode-map (kbd "p") #'tarot-prev-card)
 (define-key tarot-mode-map (kbd "n") #'tarot-next-card)
 
+;;;###autoload
 (defun tarot-reading ()
   "Perform a tarot reading."
   (interactive)
