@@ -1,0 +1,29 @@
+#+TITLE: Changelog
+#+OPTIONS: toc:nil num:nil
+
+All notable changes to this project are documented here. Format follows
+[[https://keepachangelog.com/en/1.1.0/][Keep a Changelog]]; this project adheres to
+[[https://semver.org/][Semantic Versioning]].
+
+* Unreleased
+
+* [0.1.0] - 2026-07-16
+
+** Added
+
+- Shuffling and drawing from a standard 78-card deck, with random
+  upright/reversed orientation assigned at draw time.
+- Preset "Single Card", "Three Card", and "Celtic Cross" spreads, with
+  =tarot-spreads= customizable to define your own.
+- Card meanings for all 78 cards, upright and reversed.
+- =tarot-reading= interactive command, opening a dedicated buffer that
+  displays each spread position, its card, and orientation.
+- =n=/=p= keybindings to move focus between positions in the reading
+  buffer, showing the focused card's meaning; =q= quits via inherited
+  =special-mode= bindings.
+- Customization group and faces for spread positions, major/minor
+  arcana names, and card orientation.
+- =tarot-show-reversed-orientation= option to suppress reversed display
+  and always show cards upright.
+- Support for Emacs 26.1 and newer.
+- Autoloaded =tarot-reading= entry point.
