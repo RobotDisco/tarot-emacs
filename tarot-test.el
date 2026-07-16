@@ -215,6 +215,20 @@
 
 (ert-deftest tarot-test-reading-opens-tarot-buffer ()
   "Calling tarot-reading brings up a new dedicated tarot reading buffer."
+  (unwind-protect
+      (progn
+	(tarot-reading)
+	(let ((buffer (get-buffer "*tarot*")))
+	  ;; We should have a buffer named "*tarot*"
+	  (should buffer)
+	  (with-current-buffer buffer
+	    ;; "*tarot* buffer should be using our tarot major mode.
+	    (should (derived-mode-p 'tarot-mode)))))
+    (when (get-buffer "*tarot*")
+      (kill-buffer "*tarot*"))))
+
+(ert-deftest tarot-test-reading-lists-drawn-cards-in-order ()
+  "Calling tarot-reading lays down cards in order of drawing."
 
   ;; Disable the use of reversed cards, because it makes testing deterministic.
   (let ((tarot-show-reversed-orientation nil))
@@ -226,15 +240,27 @@
 	      ;; We should have a buffer named "*tarot*"
 	      (should buffer)
 	      (with-current-buffer buffer
-		;; "*tarot* buffer should be using our tarot major mode.
-		(should (derived-mode-p 'tarot-mode))
-		;; Go to beginning of buffer
 		(goto-char (point-min))
-		;; Test the top three cards in our deck, as we have fed an
-		;; non-shuffled deck into our test invocation
 		(should (search-forward "The Fool"))
 		(should (search-forward "The Magician"))
 		(should (search-forward "The High Priestess")))))
+	(when (get-buffer "*tarot*")
+	  (kill-buffer "*tarot*"))))))
+
+(ert-deftest tarot-test-reading-calls-tarot-shuffle ()
+  "Calling tarot-reading shuffles the deck."
+
+  ;; Disable the use of reversed cards, because it makes testing deterministic.
+  (let ((tarot-show-reversed-orientation nil)
+	(tarot-shuffle-called nil))
+    (cl-letf (((symbol-function 'tarot-shuffle)
+	       (lambda (x)
+		 (setq tarot-shuffle-called t)
+		 x)))
+      (unwind-protect
+	  (progn
+	    (tarot-reading)
+	    (should tarot-shuffle-called))
 	(when (get-buffer "*tarot*")
 	  (kill-buffer "*tarot*"))))))
 
