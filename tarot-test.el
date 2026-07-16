@@ -435,6 +435,78 @@ START-IDX sets focused card position, zero-indexed."
   (should (eq (lookup-key tarot-mode-map (kbd "n")) #'tarot-next-card))
   (should (eq (lookup-key tarot-mode-map (kbd "p")) #'tarot-prev-card)))
 
+(ert-deftest tarot-test-reading-cycles-meaning-in-ui ()
+  "Meanings rotate as n/p is pressed in tarot-reading buffer."
+
+  (let ((tarot-show-reversed-orientation nil))
+    (cl-letf (((symbol-function 'tarot-shuffle) #'identity)
+	      ((symbol-function 'completing-read) (lambda (&rest _)
+						    "Three Card")))
+      (unwind-protect
+	  (progn
+	    (tarot-reading)
+	    (with-current-buffer "*tarot*"
+	      ;; Check what meaings are and aren't displayed as we cycle through
+	      ;; focused cards.
+	      (should
+	       (string-match-p
+		(regexp-quote "New beginnings, spontaneity, a leap of faith")
+		(buffer-string)))
+	      (should-not(string-match-p (regexp-quote "Willpower, creation")
+					 (buffer-string)))
+	      (should-not (string-match-p (regexp-quote "Intuited wisdom")
+					  (buffer-string)))
+
+	      ;; Move to second card
+	      (tarot-next-card)
+
+	      (should-not
+	       (string-match-p
+		(regexp-quote "New beginnings, spontaneity, a leap of faith")
+		(buffer-string)))
+	      (should (string-match-p (regexp-quote "Willpower, creation")
+				      (buffer-string)))
+	      (should-not (string-match-p (regexp-quote "Intuited wisdom")
+					  (buffer-string)))
+
+	      ;; Move to third card
+	      (tarot-next-card)
+
+	      (should-not
+	       (string-match-p
+		(regexp-quote "New beginnings, spontaneity, a leap of faith")
+		(buffer-string)))
+	      (should-not (string-match-p (regexp-quote "Willpower, creation")
+					  (buffer-string)))
+	      (should (string-match-p (regexp-quote "Intuited wisdom")
+				      (buffer-string)))
+
+	      ;; This wraps around to the first card
+	      (tarot-next-card)
+
+	      (should
+	       (string-match-p
+		(regexp-quote "New beginnings, spontaneity, a leap of faith")
+		(buffer-string)))
+	      (should-not (string-match-p (regexp-quote "Willpower, creation")
+					  (buffer-string)))
+	      (should-not (string-match-p (regexp-quote "Intuited wisdom")
+					  (buffer-string)))
+
+	      ;; This wraps back to the last card
+	      (tarot-prev-card)
+
+	      (should-not
+	       (string-match-p
+		(regexp-quote "New beginnings, spontaneity, a leap of faith")
+		(buffer-string)))
+	      (should-not (string-match-p (regexp-quote "Willpower, creation")
+					  (buffer-string)))
+	      (should (string-match-p (regexp-quote "Intuited wisdom")
+				      (buffer-string))))))
+      (when (get-buffer "*tarot*")
+	(kill-buffer "*tarot*")))))
+
 
 ;;; Iteration 13 - Tarot card meanings displayed in UI -------------------------
 

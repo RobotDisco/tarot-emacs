@@ -278,8 +278,7 @@ Used to display card meaning.")
 				       (tarot-shuffle tarot-deck)
 				       (tarot-spreads-get spread)))
 		  tarot--position-index 0)
-      (let ((inhibit-read-only t))
-	(tarot--render))
+      (tarot--render)
       (pop-to-buffer tarot-buffer-name))))
 
 (defun tarot--render ()
@@ -292,26 +291,27 @@ Rendering is dependant on two buffer-local variables:
 The currently selected position renders the meaning of the associated card,
 which is omitted from the other cards."
   (save-excursion
-    (erase-buffer)
-    (dolist (cur tarot--reading)
-      (let ((spreadpos (car cur))
-	    (spreadcard (cdr cur)))
-	(insert (propertize spreadpos 'face 'tarot-spread-position-face) "\n")
-	(insert "  " (propertize (tarot-card-name spreadcard) 'face
-				 (if (tarot-major-arcana-p spreadcard)
-				     'tarot-major-arcana-face
-				   'tarot-minor-arcana-face)) "\n")
-	(insert "  "
-		(propertize (tarot-card-orientation-string spreadcard)
-			    'face
-			    (tarot-card-orientation-face spreadcard))
-		"\n")
-	(when (equal (cdr (nth tarot--position-index tarot--reading))
-		     spreadcard)
-	  (insert "\n" (propertize (tarot-card-meaning spreadcard)
-				   'face 'tarot-meaning-face)
-		  "\n"))
-	(insert "\n")))))
+    (let ((inhibit-read-only t))
+      (erase-buffer)
+      (dolist (cur tarot--reading)
+	(let ((spreadpos (car cur))
+	      (spreadcard (cdr cur)))
+	  (insert (propertize spreadpos 'face 'tarot-spread-position-face) "\n")
+	  (insert "  " (propertize (tarot-card-name spreadcard) 'face
+				   (if (tarot-major-arcana-p spreadcard)
+				       'tarot-major-arcana-face
+				     'tarot-minor-arcana-face)) "\n")
+	  (insert "  "
+		  (propertize (tarot-card-orientation-string spreadcard)
+			      'face
+			      (tarot-card-orientation-face spreadcard))
+		  "\n")
+	  (when (equal (cdr (nth tarot--position-index tarot--reading))
+		       spreadcard)
+	    (insert "\n" (propertize (tarot-card-meaning spreadcard)
+				     'face 'tarot-meaning-face)
+		    "\n"))
+	  (insert "\n"))))))
 
 (defun tarot--move-card-focus (move-fn)
   "Change focused card in the tarot reading UI buffer.
