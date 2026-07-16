@@ -304,7 +304,8 @@ which is omitted from the other cards."
 		     spreadcard)
 	  (insert "\n" (propertize (tarot-card-meaning spreadcard)
 				   'face 'tarot-meaning-face)
-		  "\n\n"))))))
+		  "\n"))
+	(insert "\n")))))
 
 (defun tarot--move-card-focus (move-fn)
   "Change focused card in the tarot reading UI buffer.
