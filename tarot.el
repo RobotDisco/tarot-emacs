@@ -268,14 +268,19 @@ Used to display card meaning.")
 (defun tarot-reading ()
   "Perform a tarot reading."
   (interactive)
-  (with-current-buffer (get-buffer-create tarot-buffer-name)
-    (tarot-mode)
-    (setq-local tarot--reading (car (tarot-draw-reading (tarot-shuffle tarot-deck)
-							(tarot-spreads-get "Three Card")))
-		tarot--position-index 0)
-    (let ((inhibit-read-only t))
-      (tarot--render))
-    (pop-to-buffer tarot-buffer-name)))
+  (let ((spread (completing-read "Choose tarot spread: "
+				 tarot-spreads
+				 nil
+				 t)))
+    (with-current-buffer (get-buffer-create tarot-buffer-name)
+      (tarot-mode)
+      (setq-local tarot--reading (car (tarot-draw-reading
+				       (tarot-shuffle tarot-deck)
+				       (tarot-spreads-get spread)))
+		  tarot--position-index 0)
+      (let ((inhibit-read-only t))
+	(tarot--render))
+      (pop-to-buffer tarot-buffer-name))))
 
 (defun tarot--render ()
   "Render a tarot reading into buffer.

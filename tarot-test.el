@@ -545,5 +545,19 @@ START-IDX sets focused card position, zero-indexed."
 	(when (get-buffer "*tarot*")
 	  (kill-buffer "*tarot*"))))))
 
+(ert-deftest tarot-test-reading-can-be-passed-a-different-spread ()
+  "Calling tarot-reading can be supplied a different prompt via prompt."
+
+  (cl-letf (((symbol-function 'completing-read) (lambda (&rest _)
+						  "Celtic Cross")))
+    (unwind-protect
+	(progn
+	  (tarot-reading)
+	  (with-current-buffer "*tarot*"
+	    (should (= (length tarot--reading)
+		       (length (tarot-spreads-get "Celtic Cross"))))))
+      (when (get-buffer "*tarot*")
+	(kill-buffer "*tarot*")))))
+
 (provide 'tarot-test)
 ;;; tarot-test.el ends here
