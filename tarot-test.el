@@ -10,7 +10,10 @@
 ;; Tarot.el tests
 
 ;;; Code:
+(require 'cl-lib)
 (require 'ert)
+(require 'seq)
+
 (require 'tarot)
 (require 'tarot-meanings)
 
@@ -71,7 +74,7 @@
 (ert-deftest tarot-test-draw-cards ()
   "Drawing N cards returns the first N cards from the deck."
   (should (equal (car (tarot-draw tarot-deck 3 #'identity))
-		 (take 3 tarot-deck)))
+		 (seq-take tarot-deck 3)))
   (should (equal (car (tarot-draw '() 5))
 		 '())))
 
@@ -246,8 +249,8 @@ START-IDX sets focused card position, zero-indexed."
       (setq-local tarot--reading
 		  '(("First" . (:name "The Fool" :orientation :upright))
 		    ("Second" . (:name "Five of Swords" :orientation :reversed))
-		    ("Third" . (:name "Wheel of Fortune" :orientation :upright)))
-		  tarot--position-index (or start-idx 1))
+		    ("Third" . (:name "Wheel of Fortune" :orientation :upright))))
+      (setq-local tarot--position-index (or start-idx 1))
       (tarot--render)
       (funcall assertions-fn))))
 

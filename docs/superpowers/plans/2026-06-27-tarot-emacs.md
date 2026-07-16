@@ -8,7 +8,7 @@ progressing through phases that each introduce a cluster of Emacs Lisp concepts.
 users). Buffer-local state drives erase-and-redraw rendering in a `special-mode`-derived
 major mode. Each task starts with a failing test.
 
-**Tech Stack:** Emacs Lisp 29.1+, ERT (built-in), `cl-lib` (built-in), `seq` (built-in)
+**Tech Stack:** Emacs Lisp 26.1+, ERT (built-in), `cl-lib` (built-in), `seq` (built-in)
 
 **Conventions:**
 - `tarot-` prefix for public symbols, `tarot--` for internal/private

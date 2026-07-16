@@ -14,6 +14,8 @@
 
 ;;; Code:
 (require 'cl-lib)
+(require 'seq)
+(require 'subr-x)
 
 (require 'tarot-meanings)
 
@@ -177,8 +179,8 @@ Apply DRAW-FN to each drawn card if supplied.  Otherwise, apply
   (if (< (length deck) count)
       (cons nil (list deck))
     (let ((f (or draw-fn #'tarot--card-orient)))
-      (cons (mapcar f (take count deck))
-	    (list (drop count deck))))))
+      (cons (mapcar f (seq-take deck count))
+	    (list (seq-drop deck count))))))
 
 (defun tarot-card-orientation (card)
   "Return card orientation for CARD.
@@ -276,15 +278,15 @@ Used to display card meaning.")
       (tarot-mode)
       (setq-local tarot--reading (car (tarot-draw-reading
 				       (tarot-shuffle tarot-deck)
-				       (tarot-spreads-get spread)))
-		  tarot--position-index 0)
+				       (tarot-spreads-get spread))))
+      (setq-local tarot--position-index 0)
       (tarot--render)
       (pop-to-buffer tarot-buffer-name))))
 
 (defun tarot--render ()
   "Render a tarot reading into buffer.
 
-Rendering is dependant on two buffer-local variables:
+Rendering is dependant on two variables that are buffer-local:
 1. `tarot--reading' is the tarot reading generated for this specific buffer.
 2. `tarot--position-index' is the currently selected card in the buffer.
 
@@ -339,7 +341,7 @@ accounting for wraparound in the available card positions in `tarot--reading'.
 
 If `tarot-show-reversed-orientation' is unset, return :upright in place of
 :reversed orientation values."
-  (if-let (orientation (tarot-card-orientation card))
+  (if-let* ((orientation (tarot-card-orientation card)))
       (if tarot-show-reversed-orientation
 	  orientation
 	:upright)))
