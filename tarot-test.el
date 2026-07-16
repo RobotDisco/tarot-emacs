@@ -215,54 +215,19 @@
 
 (ert-deftest tarot-test-reading-opens-tarot-buffer ()
   "Calling tarot-reading brings up a new dedicated tarot reading buffer."
-  (unwind-protect
-      (progn
-	(tarot-reading)
-	(let ((buffer (get-buffer "*tarot*")))
-	  ;; We should have a buffer named "*tarot*"
-	  (should buffer)
-	  (with-current-buffer buffer
-	    ;; "*tarot* buffer should be using our tarot major mode.
-	    (should (derived-mode-p 'tarot-mode)))))
-    (when (get-buffer "*tarot*")
-      (kill-buffer "*tarot*"))))
-
-(ert-deftest tarot-test-reading-lists-drawn-cards-in-order ()
-  "Calling tarot-reading lays down cards in order of drawing."
-
-  ;; Disable the use of reversed cards, because it makes testing deterministic.
-  (let ((tarot-show-reversed-orientation nil))
-    (cl-letf (((symbol-function 'tarot-shuffle) #'identity))
-      (unwind-protect
-	  (progn
-	    (tarot-reading)
-	    (let ((buffer (get-buffer "*tarot*")))
-	      ;; We should have a buffer named "*tarot*"
-	      (should buffer)
-	      (with-current-buffer buffer
-		(goto-char (point-min))
-		(should (search-forward "The Fool"))
-		(should (search-forward "The Magician"))
-		(should (search-forward "The High Priestess")))))
-	(when (get-buffer "*tarot*")
-	  (kill-buffer "*tarot*"))))))
-
-(ert-deftest tarot-test-reading-calls-tarot-shuffle ()
-  "Calling tarot-reading shuffles the deck."
-
-  ;; Disable the use of reversed cards, because it makes testing deterministic.
-  (let ((tarot-show-reversed-orientation nil)
-	(tarot-shuffle-called nil))
-    (cl-letf (((symbol-function 'tarot-shuffle)
-	       (lambda (x)
-		 (setq tarot-shuffle-called t)
-		 x)))
-      (unwind-protect
-	  (progn
-	    (tarot-reading)
-	    (should tarot-shuffle-called))
-	(when (get-buffer "*tarot*")
-	  (kill-buffer "*tarot*"))))))
+  (cl-letf (((symbol-function 'completing-read) (lambda (&rest _)
+						  "Celtic Cross")))
+    (unwind-protect
+	(progn
+	  (tarot-reading)
+	  (let ((buffer (get-buffer "*tarot*")))
+	    ;; We should have a buffer named "*tarot*"
+	    (should buffer)
+	    (with-current-buffer buffer
+	      ;; "*tarot* buffer should be using our tarot major mode.
+	      (should (derived-mode-p 'tarot-mode)))))
+      (when (get-buffer "*tarot*")
+	(kill-buffer "*tarot*")))))
 
 ;;; Iteration 11 - Tarot UI rendering ------------------------------------------
 
@@ -538,6 +503,47 @@ START-IDX sets focused card position, zero-indexed."
 		 '(:name "The Fool" :orientation :reversed))
 		:upright))
     (should-not (tarot--card-display-orientation '(:name "The Fool")))))
+
+;;; Iteration 15 - Wire tarot--render to tarot-reading -------------------------
+
+(ert-deftest tarot-test-reading-lists-drawn-cards-in-order ()
+  "Calling tarot-reading lays down cards in order of drawing."
+
+  ;; Disable the use of reversed cards, because it makes testing deterministic.
+  (let ((tarot-show-reversed-orientation nil))
+    (cl-letf (((symbol-function 'tarot-shuffle) #'identity)
+	      ((symbol-function 'completing-read) (lambda (&rest _)
+						    "Celtic Cross")))
+      (unwind-protect
+	  (progn
+	    (tarot-reading)
+	    (let ((buffer (get-buffer "*tarot*")))
+	      (with-current-buffer buffer
+		(goto-char (point-min))
+		(should (search-forward "The Fool"))
+		(should (search-forward "The Magician"))
+		(should (search-forward "The High Priestess")))))
+	(when (get-buffer "*tarot*")
+	  (kill-buffer "*tarot*"))))))
+
+(ert-deftest tarot-test-reading-calls-tarot-shuffle ()
+  "Calling tarot-reading shuffles the deck."
+
+  ;; Disable the use of reversed cards, because it makes testing deterministic.
+  (let ((tarot-show-reversed-orientation nil)
+	(tarot-shuffle-called nil))
+    (cl-letf (((symbol-function 'tarot-shuffle)
+	       (lambda (x)
+		 (setq tarot-shuffle-called t)
+		 x))
+	      ((symbol-function 'completing-read) (lambda (&rest _)
+						    "Celtic Cross")))
+      (unwind-protect
+	  (progn
+	    (tarot-reading)
+	    (should tarot-shuffle-called))
+	(when (get-buffer "*tarot*")
+	  (kill-buffer "*tarot*"))))))
 
 (provide 'tarot-test)
 ;;; tarot-test.el ends here
