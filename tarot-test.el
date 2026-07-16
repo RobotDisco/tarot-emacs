@@ -506,9 +506,9 @@ START-IDX sets focused card position, zero-indexed."
 	      (should-not (string-match-p (regexp-quote "Willpower, creation")
 					  (buffer-string)))
 	      (should (string-match-p (regexp-quote "Intuited wisdom")
-				      (buffer-string))))))
-      (when (get-buffer "*tarot*")
-	(kill-buffer "*tarot*")))))
+				      (buffer-string)))))
+	(when (get-buffer "*tarot*")
+	  (kill-buffer "*tarot*"))))))
 
 
 ;;; Iteration 13 - Tarot card meanings displayed in UI -------------------------
