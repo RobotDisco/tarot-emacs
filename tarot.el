@@ -165,7 +165,7 @@ For more details, see https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle
 	      (aref deck-vec (1- ceiling)) rand-val)))
     (cl-coerce deck-vec 'list)))
 
-(defun tarot-draw (deck count &optional draw-fn)
+(defun tarot-draw (deck count)
   "Return the first COUNT cards from DECK, and remaining cards.
 
 If the deck has enough cards, returns a two-element list:
@@ -174,15 +174,11 @@ If the deck has enough cards, returns a two-element list:
 
 If the deck has less cards than the draw requests, return:
 1. An empty list.
-2. The list of remaining cards, unmodified.
-
-Apply DRAW-FN to each drawn card if supplied.  Otherwise, apply
-`tarot--card-orient'."
+2. The list of remaining cards, unmodified."
   (if (< (length deck) count)
       (cons nil (list deck))
-    (let ((f (or draw-fn #'tarot--card-orient)))
-      (cons (mapcar f (seq-take deck count))
-	    (list (seq-drop deck count))))))
+    (cons (mapcar #'tarot--card-orient (seq-take deck count))
+	  (list (seq-drop deck count)))))
 
 (defun tarot-card-orientation (card)
   "Return card orientation for CARD.
@@ -211,15 +207,12 @@ This is the default function applied by `tarot-draw'."
 						   :upright
 						 :reversed)))
 
-(defun tarot-draw-reading (deck spread &optional draw-fn)
+(defun tarot-draw-reading (deck spread)
   "Given a DECK of cards and a SPREAD of positions, return a reading.
 
 A reading is an alist where the car is the position key and the cdr is the card
-drawn in that position.
-
-If DRAW-FN is supplied, it is applied to every card that is drawn before
-inserting into the spread mapping instead of the default drawing function."
-  (seq-let (drawn remaining) (tarot-draw deck (length spread) draw-fn)
+drawn in that position."
+  (seq-let (drawn remaining) (tarot-draw deck (length spread))
     (cons (cl-mapcar #'cons spread drawn)
 	  (list remaining))))
 

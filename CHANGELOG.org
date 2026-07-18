@@ -7,6 +7,12 @@ All notable changes to this project are documented here. Format follows
 
 * Unreleased
 
+** Changed
+
+- =tarot-draw= and =tarot-draw-reading= no longer accept an optional
+  DRAW-FN argument to override card orientation; orientation is now
+  always determined internally via =tarot--card-orient=.
+
 * [0.1.0] - 2026-07-16
 
 ** Added

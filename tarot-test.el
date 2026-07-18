@@ -73,30 +73,34 @@
 
 (ert-deftest tarot-test-draw-cards ()
   "Drawing N cards returns the first N cards from the deck."
-  (should (equal (car (tarot-draw tarot-deck 3 #'identity))
-		 (seq-take tarot-deck 3)))
-  (should (equal (car (tarot-draw '() 5))
-		 '())))
+  (cl-letf (((symbol-function 'tarot--card-orient) #'identity))
+    (should (equal (car (tarot-draw tarot-deck 3))
+		   (seq-take tarot-deck 3)))
+    (should (equal (car (tarot-draw '() 5))
+		   '()))))
 
 (ert-deftest tarot-test-draw-count ()
   "The number of cards drawn and left is the same as the total deck number."
-  (seq-let (drawn remaining) (tarot-draw tarot-deck 5 #'identity)
-    (should (= (length drawn) 5))
-    (should (= (length remaining) (- (length tarot-deck) 5)))))
+  (cl-letf (((symbol-function 'tarot--card-orient) #'identity))
+    (seq-let (drawn remaining) (tarot-draw tarot-deck 5)
+      (should (= (length drawn) 5))
+      (should (= (length remaining) (- (length tarot-deck) 5))))))
 
 (ert-deftest tarot-test-draw-splits-deck ()
   "The cards in the drawn and remaining piles make up the entire deck."
-  (seq-let (drawn remaining) (tarot-draw tarot-deck 5 #'identity)
-    (should (equal (append drawn remaining)
-		   tarot-deck))))
+  (cl-letf (((symbol-function 'tarot--card-orient) #'identity))
+    (seq-let (drawn remaining) (tarot-draw tarot-deck 5)
+      (should (equal (append drawn remaining)
+		     tarot-deck)))))
 
 (ert-deftest tarot-test-draw-too-many-cards ()
   "Drawing too many cards returns empty list, leaving all cards as remaining."
   (let ((request-num 10)
 	(cards '(one two three four five)))
-    (seq-let (drawn remaining) (tarot-draw cards request-num #'identity)
-      (should-not drawn)
-      (should (equal cards remaining)))))
+    (cl-letf (((symbol-function 'tarot--card-orient) #'identity))
+      (seq-let (drawn remaining) (tarot-draw cards request-num)
+	(should-not drawn)
+	(should (equal cards remaining))))))
 
 ;;; Iteration 6 - Card orientation ---------------------------------------------
 
@@ -135,19 +139,21 @@
 (ert-deftest tarot-test-draw-reading-draws-without-replacement ()
   "Drawing into a spread never replaces cards in the deck."
   (let ((spread (number-sequence 1 78)))
-    (seq-let (reading remaining) (tarot-draw-reading tarot-deck
-						     spread
-						     #'identity)
-      (should (= (length remaining) 0))
-      (let ((rcards (mapcar #'cdr reading)))
-	(should (equal rcards (cl-remove-duplicates rcards :test #'equal)))))))
+    (cl-letf (((symbol-function 'tarot--card-orient) #'identity))
+      (seq-let (reading remaining) (tarot-draw-reading tarot-deck
+						       spread)
+	(should (= (length remaining) 0))
+	(let ((rcards (mapcar #'cdr reading)))
+	  (should (equal rcards (cl-remove-duplicates rcards
+						      :test #'equal))))))))
 
 (ert-deftest tarot-test-draw-reading-too-many-cards ()
   "Drawing too many cards returns nil reading."
   (let ((spread '("pos1" "pos2" "pos3" "pos4" "pos5" "pos6" "pos7" "pos8"))
 	(cards '(one two three four five)))
-    (seq-let (reading _) (tarot-draw-reading cards spread #'identity)
-      (should-not reading))))
+    (cl-letf (((symbol-function 'tarot--card-orient) #'identity))
+      (seq-let (reading _) (tarot-draw-reading cards spread)
+	(should-not reading)))))
 
 (ert-deftest tarot-test-spread-get-by-name ()
   "`tarot-spreads-get' performs a name lookup from `tarot-spreads'."
