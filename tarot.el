@@ -2,6 +2,7 @@
 
 ;; Copyright (C) 2026 Gaelan D'costa
 ;; Author: Gaelan D'costa <gaelan@fastmail.ca>
+;; URL: https://github.com/RobotDisco/tarot-emacs
 ;; Version: 0.1.0
 ;; Package-Requires: ((emacs "26.1"))
 ;; Keywords: games
