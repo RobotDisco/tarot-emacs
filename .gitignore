@@ -1,4 +1,10 @@
+# Nix build artifacts
+/result
+
+# Emacs Lisp compilation artifacts
 *.elc
+
+# Editor backup files
 *~
 \#*\#
 .#*
